@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Director en prueba — Simulación de 13 semanas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0F1424; --bg2:#161D33; --card:#1C2438; --line:#2A3350;
+    --ink:#F0F2FA; --ink-soft:#9AA3C0;
+    --accent:#4FD1C5; --accent2:#F0A050;
+    --ok:#3ECF8E; --bad:#FF5C7A; --warn:#F0C050;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;
+    background:radial-gradient(circle at 20% 0%, var(--bg2), var(--bg1) 60%);
+    color:var(--ink);font-family:'Inter',sans-serif;line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Poppins',sans-serif;margin:0;}
+  .wrap{max-width:720px;margin:0 auto;padding:26px 18px 60px;}
+
+  header{text-align:center;margin-bottom:22px;}
+  .role-tag{display:inline-block;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0F1424;font-family:'Poppins',sans-serif;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border-radius:14px;margin-bottom:10px;}
+  h1{font-size:22px;font-weight:800;}
+  .subtitle{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:22px 0 26px;}
+  .stat-box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;}
+  .stat-name{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+  .stat-value{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;}
+  .stat-bar-track{height:7px;background:#0F1424;border-radius:6px;margin-top:8px;overflow:hidden;}
+  .stat-bar-fill{height:100%;border-radius:6px;transition:width .7s cubic-bezier(.22,1,.36,1), background-color .4s;}
+  .stat-float{position:absolute;top:8px;right:10px;font-family:'Poppins',sans-serif;font-weight:800;font-size:13px;opacity:0;transition:opacity .3s, transform .3s;transform:translateY(6px);}
+  .stat-float.show{opacity:1;transform:translateY(0);}
+  .stat-float.pos{color:var(--ok);}
+  .stat-float.neg{color:var(--bad);}
+
+  #weekProgress{display:flex;justify-content:center;gap:5px;margin-bottom:18px;flex-wrap:wrap;}
+  .week-dot{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .week-dot.done{background:var(--accent);}
+  .week-dot.current{background:var(--accent2);box-shadow:0 0 0 3px rgba(240,160,80,.25);}
+
+  .scenario-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px 22px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .week-label{font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+  .week-title{font-size:19px;font-weight:700;margin-bottom:10px;}
+  .story-text{font-size:14.5px;color:var(--ink-soft);margin-bottom:20px;}
+
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt-btn{
+    text-align:left;background:#151B2E;border:1.5px solid var(--line);color:var(--ink);
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+    padding:14px 16px;border-radius:12px;cursor:pointer;transition:border-color .15s, background .15s, transform .1s;
+  }
+  .opt-btn:hover:not(:disabled){border-color:var(--accent);background:#182036;transform:translateY(-1px);}
+  .opt-btn:disabled{cursor:default;opacity:.55;}
+  .opt-btn.chosen{border-color:var(--accent2);background:#241C14;opacity:1;}
+  .opt-letter{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--line);color:var(--ink);font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;margin-right:10px;}
+  .opt-btn.chosen .opt-letter{background:var(--accent2);color:#0F1424;}
+
+  .consequence-box{
+    display:none;margin-top:18px;background:#131A2C;border-left:4px solid var(--accent2);
+    border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--ink);
+  }
+  .consequence-box .deltas{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+  .delta-chip{font-family:'Poppins',sans-serif;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:10px;}
+  .delta-chip.pos{background:rgba(62,207,142,.15);color:var(--ok);}
+  .delta-chip.neg{background:rgba(255,92,122,.15);color:var(--bad);}
+
+  .next-btn{
+    display:none;margin:20px auto 0;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#0F1424;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+    border:none;padding:12px 28px;border-radius:24px;cursor:pointer;
+  }
+
+  #finalScreen{display:none;text-align:center;}
+  #finalScreen .final-icon{font-size:56px;margin-bottom:6px;}
+  #finalScreen h2{font-size:24px;margin-bottom:8px;}
+  #finalScreen p.final-msg{font-size:14.5px;color:var(--ink-soft);max-width:480px;margin:0 auto 22px;}
+  .final-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:26px;}
+  .replay-btn{
+    background:transparent;border:1.5px solid var(--accent);color:var(--accent);
+    font-family:'Poppins',sans-serif;font-weight:700;font-size:13.5px;
+    padding:11px 24px;border-radius:22px;cursor:pointer;
+  }
+
+  #gameArea{display:block;}
+  footer.page-footer{text-align:center;font-size:11px;color:var(--ink-soft);margin-top:34px;opacity:.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="role-tag">Periodo de prueba · 13 semanas</span>
+    <h1>Director en prueba</h1>
+    <div class="subtitle">Cada decisión tiene consecuencias. No sabrás cuáles hasta elegir.</div>
+  </header>
+
+  <div class="stats" id="statsWrap"></div>
+  <div id="weekProgress"></div>
+
+  <div id="gameArea">
+    <div class="scenario-card">
+      <div class="week-label" id="weekLabel">Semana 1 / 13</div>
+      <div class="week-title" id="weekTitle"></div>
+      <div class="story-text" id="weekStory"></div>
+      <div class="options" id="weekOptions"></div>
+      <div class="consequence-box" id="consequenceBox"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextWeek()">Siguiente semana →</button>
+    </div>
+  </div>
+
+  <div id="finalScreen">
+    <div class="final-icon" id="finalIcon"></div>
+    <h2 id="finalTitle"></h2>
+    <p class="final-msg" id="finalMsg"></p>
+    <div class="final-stats" id="finalStats"></div>
+    <button class="replay-btn" onclick="restartGame()">🔄 Jugar de nuevo</button>
+  </div>
+
+  <footer class="page-footer">AMO · Simulación de gestión — prototipo interactivo</footer>
+</div>
+
+<script>
+const STAT_KEYS = ['lealtad','personal','clientes','capital','fama'];
+const STAT_LABELS = {lealtad:'Lealtad', personal:'Personal', clientes:'Clientes', capital:'Capital', fama:'Fama'};
+const STAT_ICONS = {lealtad:'🤝', personal:'👥', clientes:'💬', capital:'💰', fama:'⭐'};
+
+const WEEKS = [
+  { title: 'Problema en el Departamento de Desarrollo',
+    story: 'Al asumir tu nuevo puesto, te enteras de que el Departamento de Desarrollo tiene problemas con los plazos de entrega de proyectos. El equipo está desmotivado y las fechas límite no se están cumpliendo.',
+    options: [
+      { text:'Reorganizar el equipo de desarrollo.', consequence:'El equipo se siente más enfocado y motivado, pero cuesta dinero reorganizar los procesos.', deltas:{lealtad:1, personal:1, capital:-1} },
+      { text:'Contratar a un nuevo gerente de proyecto.', consequence:'Un nuevo líder puede motivar al equipo y mejorar los plazos, pero es costoso.', deltas:{lealtad:2, personal:1, capital:-1} },
+      { text:'Reducir las tareas no prioritarias.', consequence:'Ahorras recursos y ganas más haciendo lo más importante, pero los empleados se sienten sobrecargados con las tareas importantes.', deltas:{capital:1, personal:-1} },
+      { text:'Ignorar el problema.', consequence:'Los empleados se sienten abandonados y desmotivados.', deltas:{lealtad:-2} },
+    ] },
+  { title: 'Quejas de los Clientes',
+    story: 'Recibes varios correos electrónicos de clientes quejándose de la calidad del soporte técnico. Esto podría afectar la reputación de la empresa si no se maneja adecuadamente.',
+    options: [
+      { text:'Capacitar al personal de soporte técnico.', consequence:'Los clientes están más satisfechos, pero la capacitación es costosa.', deltas:{clientes:1, capital:-1} },
+      { text:'Contratar a más personal de soporte.', consequence:'Aumenta la capacidad de respuesta, pero incrementa los costos.', deltas:{clientes:2, capital:-1} },
+      { text:'Implementar un sistema de retroalimentación para los clientes.', consequence:'Mejora la calidad del servicio a través de feedback, pero requiere inversión.', deltas:{clientes:1, lealtad:1, capital:-1} },
+      { text:'Ignorar las quejas.', consequence:'Los clientes se sienten ignorados y pueden cambiar de proveedor.', deltas:{clientes:-2} },
+    ] },
+  { title: 'Descontento en el Departamento de Ventas',
+    story: 'El Departamento de Ventas está descontento debido a la falta de comisiones atractivas. Los vendedores consideran buscar empleo en otras empresas.',
+    options: [
+      { text:'Aumentar las comisiones.', consequence:'Motiva a los vendedores y mejora la calidad de trabajo, pero reduce el capital.', deltas:{lealtad:2, personal:1, capital:-1} },
+      { text:'Ofrecer incentivos no monetarios (vacaciones, premios).', consequence:'Mejora la motivación, pero el resultado es limitado y tiene un costo.', deltas:{lealtad:1, capital:-1} },
+      { text:'Revisar las metas de ventas y ajustarlas.', consequence:'Los vendedores sienten que las metas son más alcanzables.', deltas:{lealtad:1, personal:1} },
+      { text:'Ignorar el descontento.', consequence:'Los vendedores pueden decidir dejar la empresa.', deltas:{lealtad:-2} },
+    ] },
+  { title: 'Oportunidad de Expansión Internacional',
+    story: 'Surge una oportunidad de expandir la empresa a un mercado internacional. Esto podría aumentar significativamente los ingresos, pero también representa un riesgo financiero.',
+    options: [
+      { text:'Investigar el nuevo mercado antes de expandirse.', consequence:'Reduce el riesgo financiero y mejora la reputación, pero requiere tiempo y recursos.', deltas:{capital:1, fama:1} },
+      { text:'Expandirse inmediatamente.', consequence:'Aumenta los ingresos rápidamente, pero el personal se siente sobrecargado.', deltas:{capital:2, lealtad:-1} },
+      { text:'Buscar socios locales para la expansión.', consequence:'Mejora las posibilidades de éxito, pero el personal se siente menos involucrado.', deltas:{capital:1, fama:1, lealtad:-1} },
+      { text:'No expandirse.', consequence:'Pierdes una oportunidad de aumentar los ingresos — otra empresa la ha aprovechado.', deltas:{fama:-1} },
+    ] },
+  { title: 'Problemas de Comunicación Interna',
+    story: 'Notas que hay problemas de comunicación entre los departamentos, lo que causa retrasos y errores en los proyectos.',
+    options: [
+      { text:'Implementar una nueva plataforma de comunicación interna.', consequence:'Mejora la comunicación y la colaboración, pero es costosa.', deltas:{lealtad:1, personal:1, capital:-1} },
+      { text:'Organizar reuniones semanales entre departamentos.', consequence:'Mejora la comunicación y la moral, pero toma tiempo que podría dedicarse a otras tareas — al personal no le entusiasma.', deltas:{lealtad:1} },
+      { text:'Capacitar a los empleados en habilidades de comunicación.', consequence:'Mejora la comunicación, pero no da buenos resultados inmediatos en productividad.', deltas:{lealtad:1} },
+      { text:'Ignorar los problemas de comunicación.', consequence:'Los empleados se sienten frustrados y desmotivados.', deltas:{lealtad:-2} },
+    ] },
+  { title: 'Problemas de Seguridad Informática',
+    story: 'Recibes un informe de que la empresa ha sido víctima de un ataque informático. Los datos de los clientes están en riesgo.',
+    options: [
+      { text:'Contratar a una empresa de ciberseguridad para resolver el problema.', consequence:'Aumenta la confianza de los clientes, pero es muy costoso.', deltas:{fama:1, clientes:1, capital:-1} },
+      { text:'Implementar un nuevo sistema de seguridad internamente.', consequence:'Protege los datos de los clientes y, al resolverlo todo, la empresa se hace más famosa — pero requiere recursos internos.', deltas:{clientes:1, fama:1, capital:-1} },
+      { text:'Informar a los clientes y ofrecer compensaciones.', consequence:'Aumenta la confianza de los clientes, pero es costoso.', deltas:{clientes:1, capital:-1} },
+      { text:'No hacer nada y esperar a que pase la tormenta.', consequence:'La reputación de la empresa se ve gravemente afectada y pierdes clientes.', deltas:{fama:-2, clientes:-2} },
+    ] },
+  { title: 'Bajón en la Productividad',
+    story: 'Te das cuenta de que la productividad de la empresa ha disminuido notablemente en las últimas semanas. Los proyectos se están retrasando y el ambiente laboral está tenso.',
+    options: [
+      { text:'Implementar horarios flexibles.', consequence:'Mejora la moral y la productividad.', deltas:{lealtad:1, personal:1} },
+      { text:'Dar días libres adicionales.', consequence:'Mejora la moral significativamente, pero reduce la productividad a corto plazo y tiene un costo.', deltas:{lealtad:2, personal:-1, capital:-1} },
+      { text:'Ofrecer bonos por productividad.', consequence:'Aumenta la motivación y la productividad; da buen resultado financiero al final, pero requiere inversión inicial.', deltas:{lealtad:1, personal:1, capital:1} },
+      { text:'Ignorar el problema.', consequence:'Los empleados se desmotivan aún más y la productividad sigue disminuyendo.', deltas:{lealtad:-2} },
+    ] },
+  { title: 'Conflicto entre Departamentos',
+    story: 'Surge un conflicto entre el Departamento de Desarrollo y el Departamento de Marketing. Ambos departamentos se culpan mutuamente por el retraso en un proyecto importante.',
+    options: [
+      { text:'Mediar una reunión entre los jefes de departamento.', consequence:'Ayuda a resolver el conflicto y mejora la comunicación.', deltas:{lealtad:1, personal:1} },
+      { text:'Asignar un mediador neutral.', consequence:'Resuelve el conflicto de manera justa y la gente trabaja mejor, pero es costoso.', deltas:{lealtad:2, personal:1, capital:-1} },
+      { text:'Redistribuir las responsabilidades del proyecto.', consequence:'Aclara las responsabilidades y mejora la moral, pero sobrecarga a algunos empleados.', deltas:{lealtad:1, personal:-1} },
+      { text:'Ignorar el conflicto.', consequence:'El conflicto empeora y afecta la moral de los empleados.', deltas:{lealtad:-1} },
+    ] },
+  { title: 'Problemas con la Moral del Personal',
+    story: 'El personal está desmotivado debido a la falta de reconocimiento y recompensas por su trabajo duro. Los empleados han comenzado a quejarse de la falta de incentivos y la alta carga de trabajo.',
+    options: [
+      { text:'Implementar un programa de bienestar.', consequence:'Mejora significativamente la moral del personal, pero requiere una inversión significativa.', deltas:{lealtad:2, capital:-1} },
+      { text:'Despedir a alguien.', consequence:'Los empleados se sienten más concentrados, aunque a costa de las relaciones — muestra mano firme de control.', deltas:{lealtad:-1, personal:-1, capital:1, fama:1} },
+      { text:'Organizar actividades de equipo.', consequence:'Fomenta la cohesión y la moral del equipo, pero tiene un costo.', deltas:{lealtad:1, capital:-1} },
+      { text:'Ignorar las quejas.', consequence:'Los empleados se sienten desvalorizados y desmotivados.', deltas:{lealtad:-1} },
+    ] },
+  { title: 'Proyecto Atrasado',
+    story: 'Un proyecto importante está atrasado y los clientes están empezando a impacientarse. Si no se entrega a tiempo, podrías perder un contrato valioso.',
+    options: [
+      { text:'Asignar más recursos al proyecto.', consequence:'Acelera la entrega del proyecto, pero sobrecarga al personal (alguien ha renunciado) y es costoso.', deltas:{clientes:1, personal:-1, capital:-1, fama:1} },
+      { text:'Negociar una extensión del plazo con el cliente.', consequence:'Ganas tiempo para entregar el proyecto sin costos adicionales.', deltas:{clientes:1, capital:1} },
+      { text:'Pedir ayuda externa para completar el proyecto.', consequence:'Asegura la entrega a tiempo, pero es muy costoso.', deltas:{clientes:1, capital:-2} },
+      { text:'No hacer nada y esperar.', consequence:'El proyecto se retrasa aún más y el cliente podría cancelar el contrato.', deltas:{clientes:-2} },
+    ] },
+  { title: 'Innovación Tecnológica',
+    story: 'Aparece una nueva tecnología en el mercado que podría mejorar significativamente los productos y servicios de la empresa. Adoptarla implicaría una inversión considerable.',
+    options: [
+      { text:'Adoptar la nueva tecnología por completo.', consequence:'Mejora la competitividad y la reputación, pero requiere una inversión muy significativa.', deltas:{fama:1, capital:-2} },
+      { text:'Esperar a que la tecnología se estabilice.', consequence:'Perdéis la oportunidad y la competencia la aprovecha — también perdéis algunos clientes.', deltas:{fama:-1, clientes:-1} },
+      { text:'Implementar la tecnología parcialmente.', consequence:'Mejora los productos gradualmente y con menos riesgo, aunque no aprovecha todo el potencial.', deltas:{capital:1, fama:1} },
+      { text:'Ignorar la nueva tecnología.', consequence:'Pierdes una oportunidad de mejorar y la competencia podría superarte.', deltas:{capital:-1, fama:-1} },
+    ] },
+  { title: 'Auditoría Interna',
+    story: 'La empresa está programada para una auditoría interna. Debes asegurarte de que todos los procesos y documentación estén en orden para evitar problemas legales o financieros.',
+    options: [
+      { text:'Realizar una auditoría previa interna.', consequence:'Asegura que todo esté en orden, pero puede verse como una falta de confianza en el personal.', deltas:{capital:1, lealtad:-1} },
+      { text:'Contratar consultores externos para la auditoría.', consequence:'Asegura la calidad de la auditoría y mejora la reputación, pero es costoso.', deltas:{fama:1, capital:-1} },
+      { text:'Capacitar al personal en cumplimiento normativo.', consequence:'Mejora la moral y la eficiencia a largo plazo, pero requiere inversión.', deltas:{lealtad:1, personal:1, capital:-1} },
+      { text:'No hacer nada especial.', consequence:'Podrías enfrentarte a problemas legales y financieros si la auditoría revela irregularidades.', deltas:{capital:-1} },
+    ] },
+  { title: 'Evaluación del Periodo de Prueba',
+    story: 'Es el final de tu periodo de prueba y el consejo directivo evaluará tu desempeño. Debes preparar un informe detallado y demostrar cómo tus decisiones han impactado positivamente a la empresa.',
+    options: [
+      { text:'Preparar un informe detallado con métricas de desempeño.', consequence:'Impresiona al consejo directivo.', deltas:{fama:1} },
+      { text:'Organizar una presentación interactiva con el equipo.', consequence:'Muestra el trabajo en equipo y mejora la moral, pero tiene un costo.', deltas:{lealtad:1, fama:1, capital:-1} },
+      { text:'Solicitar feedback de los empleados y clientes.', consequence:'Mejora la relación con empleados y clientes, y muestra buenas habilidades comunicativas.', deltas:{lealtad:1, clientes:1, personal:1} },
+      { text:'No hacer nada especial.', consequence:'No destacas y es menos probable que impresiones al consejo directivo.', deltas:{fama:-2} },
+    ] },
+];
+
+const START_VALUE = 5;
+const MIN_VALUE = 0, MAX_VALUE = 10;
+let stats = {};
+let currentWeek = 0;
+let chosenThisWeek = false;
+
+function initStats(){
+  stats = {};
+  STAT_KEYS.forEach(k => stats[k] = START_VALUE);
+}
+
+function renderStatsShell(){
+  const wrap = document.getElementById('statsWrap');
+  wrap.innerHTML = STAT_KEYS.map(k => `
+    <div class="stat-box" id="statBox-${k}">
+      <div class="stat-name"><span>${STAT_ICONS[k]} ${STAT_LABELS[k]}</span></div>
+      <div class="stat-value" id="statValue-${k}">${stats[k]}</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" id="statBar-${k}" style="width:${stats[k]*10}%;"></div></div>
+      <div class="stat-float" id="statFloat-${k}"></div>
+    </div>
+  `).join('');
+  STAT_KEYS.forEach(updateBarColor);
+}
+
+function updateBarColor(k){
+  const bar = document.getElementById('statBar-'+k);
+  if(!bar) return;
+  const v = stats[k];
+  let color = '#4FD1C5';
+  if(v < 4) color = 'var(--bad)';
+  else if(v >= 8) color = 'var(--ok)';
+  else color = 'var(--warn)';
+  bar.style.background = color;
+}
+
+function applyDeltas(deltas){
+  STAT_KEYS.forEach(k=>{
+    const d = deltas[k] || 0;
+    if(d === 0) return;
+    stats[k] = Math.max(MIN_VALUE, Math.min(MAX_VALUE, stats[k] + d));
+    const valueEl = document.getElementById('statValue-'+k);
+    const barEl = document.getElementById('statBar-'+k);
+    const floatEl = document.getElementById('statFloat-'+k);
+    if(valueEl) valueEl.textContent = stats[k];
+    if(barEl) barEl.style.width = (stats[k]*10) + '%';
+    updateBarColor(k);
+    if(floatEl){
+      floatEl.textContent = (d > 0 ? '+' : '') + d;
+      floatEl.className = 'stat-float show ' + (d > 0 ? 'pos' : 'neg');
+      setTimeout(()=> floatEl.classList.remove('show'), 1600);
+    }
+  });
+}
+
+function renderWeekProgress(){
+  const el = document.getElementById('weekProgress');
+  el.innerHTML = WEEKS.map((_, i)=>{
+    let cls = 'week-dot';
+    if(i < currentWeek) cls += ' done';
+    else if(i === currentWeek) cls += ' current';
+    return `<span class="${cls}"></span>`;
+  }).join('');
+}
+
+function renderWeek(){
+  chosenThisWeek = false;
+  const w = WEEKS[currentWeek];
+  document.getElementById('weekLabel').textContent = 'Semana ' + (currentWeek+1) + ' / ' + WEEKS.length;
+  document.getElementById('weekTitle').textContent = w.title;
+  document.getElementById('weekStory').textContent = w.story;
+  const optsWrap = document.getElementById('weekOptions');
+  optsWrap.innerHTML = w.options.map((opt, i)=>`
+    <button class="opt-btn" id="opt-${i}" onclick="chooseOption(${i})">
+      <span class="opt-letter">${String.fromCharCode(65+i)}</span>${opt.text}
+    </button>
+  `).join('');
+  document.getElementById('consequenceBox').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+  renderWeekProgress();
+}
+
+function chooseOption(i){
+  if(chosenThisWeek) return;
+  chosenThisWeek = true;
+  const w = WEEKS[currentWeek];
+  const opt = w.options[i];
+
+  document.querySelectorAll('.opt-btn').forEach((btn, idx)=>{
+    btn.disabled = true;
+    if(idx === i) btn.classList.add('chosen');
+  });
+
+  applyDeltas(opt.deltas);
+
+  const deltaChips = STAT_KEYS.filter(k => opt.deltas[k]).map(k=>{
+    const d = opt.deltas[k];
+    return `<span class="delta-chip ${d>0?'pos':'neg'}">${STAT_ICONS[k]} ${STAT_LABELS[k]} ${d>0?'+':''}${d}</span>`;
+  }).join('');
+
+  const box = document.getElementById('consequenceBox');
+  box.innerHTML = `<div>${opt.consequence}</div><div class="deltas">${deltaChips}</div>`;
+  box.style.display = 'block';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = currentWeek < WEEKS.length - 1 ? 'Siguiente semana →' : 'Ver evaluación final →';
+  nextBtn.style.display = 'block';
+}
+
+function nextWeek(){
+  currentWeek++;
+  if(currentWeek >= WEEKS.length){
+    showFinalScreen();
+  } else {
+    renderWeek();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+}
+
+function evaluateOutcome(){
+  const values = STAT_KEYS.map(k => stats[k]);
+  const anyBelow4 = values.some(v => v < 4);
+  const countAbove8 = values.filter(v => v >= 8).length;
+
+  if(anyBelow4){
+    return { type:'lose', icon:'❌', title:'No has superado el periodo de prueba',
+      msg:'Al menos un área de la empresa ha quedado por debajo del nivel aceptable. El consejo directivo decide no confirmarte en el puesto. Gracias por tu esfuerzo — inténtalo de nuevo.' };
+  }
+  if(countAbove8 >= 2){
+    return { type:'promotion', icon:'🏆', title:'¡Ascenso! Director General',
+      msg:'Tu gestión ha sido excepcional en varias áreas a la vez. El consejo directivo no solo te confirma en el puesto — te ofrece un ascenso.' };
+  }
+  if(countAbove8 >= 1){
+    return { type:'win', icon:'✅', title:'¡Has superado el periodo de prueba!',
+      msg:'Tu gestión ha sido sólida y al menos un área de la empresa destaca claramente. Te confirman en el puesto de Director.' };
+  }
+  return { type:'study', icon:'📘', title:'Necesitas más formación',
+    msg:'Ninguna área de la empresa está en crisis, pero tampoco destacas en nada en particular. El consejo considera que aún te falta experiencia y te ofrece repetir el periodo de prueba.' };
+}
+
+function showFinalScreen(){
+  document.getElementById('gameArea').style.display = 'none';
+  document.getElementById('weekProgress').style.display = 'none';
+  const outcome = evaluateOutcome();
+
+  document.getElementById('finalIcon').textContent = outcome.icon;
+  document.getElementById('finalTitle').textContent = outcome.title;
+  document.getElementById('finalMsg').textContent = outcome.msg;
+
+  const finalStats = document.getElementById('finalStats');
+  finalStats.innerHTML = STAT_KEYS.map(k=>{
+    const v = stats[k];
+    let color = v < 4 ? 'var(--bad)' : v >= 8 ? 'var(--ok)' : 'var(--warn)';
+    return `<div class="stat-box"><div class="stat-name">${STAT_ICONS[k]} ${STAT_LABELS[k]}</div><div class="stat-value" style="color:${color};">${v}/10</div></div>`;
+  }).join('');
+
+  document.getElementById('finalScreen').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function restartGame(){
+  currentWeek = 0;
+  initStats();
+  renderStatsShell();
+  document.getElementById('gameArea').style.display = 'block';
+  document.getElementById('weekProgress').style.display = 'flex';
+  document.getElementById('finalScreen').style.display = 'none';
+  renderWeek();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+initStats();
+renderStatsShell();
+renderWeek();
+</script>
+</body>
+</html>
