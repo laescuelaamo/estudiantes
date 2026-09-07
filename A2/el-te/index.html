@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El té — de los campos de China al mundo moderno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Petrona:ital,wght@0,400;0,600;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16241F;
+    --card:#1F332C;
+    --card-alt:#263B33;
+    --ink:#F2ECDD;
+    --ink-soft:#B8C4BA;
+    --gold:#D9A441;
+    --gold-soft:#3C331E;
+    --jade:#7FA98C;
+    --jade-soft:#2A4038;
+    --line:#3A4C42;
+    --wrong:#D9695A;
+    --right:#8FBE7A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    line-height:1.65;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:0 24px;}
+  header.hero{
+    padding:64px 24px 36px;
+    max-width:740px;
+    margin:0 auto;
+    position:relative;
+  }
+  header.hero .kicker{color:var(--gold);font-weight:600;font-size:0.95rem;margin:0 0 10px;}
+  header.hero h1{
+    font-family:'Petrona',serif;
+    font-weight:600;
+    font-size:2.4rem;
+    line-height:1.18;
+    margin:0 0 14px;
+    max-width:16ch;
+  }
+  header.hero p.lede{font-size:1.03rem;color:var(--ink-soft);max-width:56ch;margin:0;}
+
+  .leafline{width:100%;height:22px;margin:30px 0;}
+  .leafline path{fill:none;stroke:var(--jade);stroke-width:1.6;opacity:0.6;}
+
+  section.block{max-width:740px;margin:0 auto 52px;padding:0 24px;}
+  .block-label{font-size:0.85rem;color:var(--jade);font-weight:600;margin-bottom:6px;}
+  h2.block-title{font-family:'Petrona',serif;font-weight:600;font-size:1.6rem;margin:0 0 20px;color:var(--ink);}
+
+  .card{background:var(--card);border-radius:12px;padding:26px 28px;border:1px solid var(--line);}
+  .plain-text p{margin:0 0 14px;font-size:1.02rem;}
+  .plain-text p:last-child{margin-bottom:0;}
+
+  .term{
+    background:var(--gold-soft);
+    color:var(--gold);
+    padding:1px 4px;
+    border-radius:4px;
+    cursor:pointer;
+    border-bottom:1.5px dotted var(--gold);
+  }
+  .term.shown{background:var(--jade-soft);color:var(--jade);border-bottom-color:var(--jade);}
+  .term.shown::after{
+    content: attr(data-tr);
+    display:inline-block;
+    font-size:0.78rem;
+    font-weight:600;
+    color:#16241F;
+    background:var(--jade);
+    padding:2px 8px;
+    border-radius:6px;
+    margin-left:6px;
+    vertical-align:middle;
+    white-space:nowrap;
+  }
+
+  .q-item{margin-bottom:22px;}
+  .q-item:last-child{margin-bottom:0;}
+  .q-prompt{font-weight:600;margin-bottom:10px;}
+  label.opt{
+    display:block;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    margin-bottom:8px;
+    cursor:pointer;
+    background:var(--card-alt);
+    transition:border-color .15s ease;
+  }
+  label.opt:hover{border-color:var(--gold);}
+  label.opt input{margin-right:10px;}
+  label.opt.correct{border-color:var(--right);background:#22331F;}
+  label.opt.incorrect{border-color:var(--wrong);background:#3A2320;}
+
+  .open-q{margin-bottom:20px;}
+  .open-q:last-child{margin-bottom:0;}
+  .open-q p{margin:0 0 8px;font-weight:500;}
+  textarea.notes{
+    width:100%;
+    min-height:60px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    font-family:'Work Sans',sans-serif;
+    font-size:0.94rem;
+    background:var(--card-alt);
+    color:var(--ink);
+    resize:vertical;
+  }
+
+  .fillblank-sentence{margin-bottom:14px;font-size:1.01rem;}
+  input.blank{
+    border:none;
+    border-bottom:2px solid var(--jade);
+    background:transparent;
+    font-family:'Work Sans',sans-serif;
+    font-size:1rem;
+    color:var(--ink);
+    padding:2px 4px;
+    width:160px;
+    text-align:center;
+  }
+  input.blank.correct{border-bottom-color:var(--right);color:var(--right);font-weight:600;}
+  input.blank.incorrect{border-bottom-color:var(--wrong);color:var(--wrong);}
+  .blank-answer{display:block;font-size:0.82rem;color:var(--right);margin-top:2px;}
+
+  .error-row{
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .error-row:last-child{border-bottom:none;}
+  .error-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .error-statement{flex:1;}
+  .mark-btn{
+    flex-shrink:0;
+    padding:8px 14px;
+    border-radius:8px;
+    border:1.5px solid var(--line);
+    background:var(--card-alt);
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:0.85rem;
+    font-family:'Work Sans',sans-serif;
+    white-space:nowrap;
+  }
+  .mark-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-soft);}
+  .mark-btn.correct{border-color:var(--right);color:var(--right);background:#22331F;}
+  .mark-btn.incorrect{border-color:var(--wrong);color:var(--wrong);background:#3A2320;}
+  .correction-input{
+    display:none;
+    margin-top:10px;
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 12px;
+    background:var(--card-alt);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:0.92rem;
+  }
+  .error-row.marked .correction-input{display:block;}
+
+  .wordbank{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-bottom:18px;
+    padding-bottom:18px;
+    border-bottom:1px dashed var(--line);
+  }
+  .wordbank .wb-chip{
+    padding:6px 12px;
+    border-radius:100px;
+    background:var(--jade-soft);
+    color:var(--jade);
+    font-size:0.88rem;
+  }
+
+  .check-area{max-width:740px;margin:0 auto;padding:0 24px;text-align:center;}
+  button.check-btn{
+    font-family:'Work Sans',sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    background:var(--gold);
+    color:#1B2018;
+    border:none;
+    border-radius:100px;
+    padding:16px 42px;
+    cursor:pointer;
+  }
+  button.check-btn:hover{background:#EAB65B;}
+  #score-summary{margin-top:20px;font-weight:600;font-size:1.05rem;color:var(--ink);}
+
+  .glossary{max-width:740px;margin:60px auto 0;padding:0 24px;}
+  table.gloss{width:100%;border-collapse:collapse;margin-top:10px;}
+  table.gloss td{padding:10px 6px;border-bottom:1px solid var(--line);font-size:0.95rem;}
+  table.gloss td:first-child{font-weight:600;width:44%;color:var(--gold);}
+  table.gloss td:last-child{color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="kicker">Lectura y gramática</p>
+  <h1>El té — de los campos de China al mundo moderno</h1>
+  <p class="lede">Cinco mil años de historia en una taza: de la leyenda del emperador Shennong a la ceremonia japonesa y el «afternoon tea» británico.</p>
+</header>
+
+<svg class="leafline wrap" viewBox="0 0 740 22" preserveAspectRatio="none">
+  <path d="M0,11 Q60,2 120,11 T240,11 T360,11 T480,11 T600,11 T740,11"/>
+</svg>
+
+<section class="block">
+  <p class="block-label">Texto</p>
+  <h2 class="block-title">El té es la bebida más consumida del mundo después del agua</h2>
+  <div class="card plain-text">
+    <p>El té es la bebida más consumida del mundo después del agua. Según los historiadores, su origen se <span class="term" data-tr="сягати, сходити до">remonta</span> a China hace más de cinco mil años. La <span class="term" data-tr="легенда">leyenda</span> cuenta que el emperador Shennong descubrió el té por accidente cuando unas <span class="term" data-tr="листок">hojas</span> cayeron en su taza de agua caliente. Aunque nadie sabe con certeza si esto ocurrió realmente, lo que sí está claro es que China ha sido durante siglos el centro de la cultura del té.</p>
+    <p>Durante la <span class="term" data-tr="династія">dinastía</span> Tang — entre los siglos VII y X — el té se convirtió en la bebida oficial del Imperio chino. Los <span class="term" data-tr="буддійський монах">monjes budistas</span> lo consumían para mantenerse despiertos durante las largas horas de <span class="term" data-tr="медитація">meditación</span>. Más tarde, los <span class="term" data-tr="торговець">mercaderes</span> árabes y persas lo llevaron a Oriente Medio, y en el siglo XVI los portugueses lo <span class="term" data-tr="запровадити, ввести">introdujeron</span> en Europa.</p>
+    <p>Hoy el té se produce en más de cincuenta países. India, China, Kenia y Sri Lanka son los mayores <span class="term" data-tr="виробник">productores</span> del mundo. En los últimos años, el consumo de té ha crecido <span class="term" data-tr="значно, суттєво">significativamente</span> en países donde antes <span class="term" data-tr="домінувати, переважати">dominaba</span> el café — como Estados Unidos o España. Los expertos <span class="term" data-tr="передбачати">predicen</span> que para 2030 el mercado global del té habrá <span class="term" data-tr="досягати">alcanzado</span> un valor de cien mil millones de dólares.</p>
+    <p>Lo que hace especial al té no es solo su sabor — es su <span class="term" data-tr="ритуал">ritual</span>. En Japón existe la <span class="term" data-tr="церемонія">ceremonia</span> del té, que lleva siglos practicándose. En Gran Bretaña, el «afternoon tea» sigue siendo una tradición <span class="term" data-tr="священний">sagrada</span>. Y en muchos países árabes, ofrecer té a un <span class="term" data-tr="гість">invitado</span> es un símbolo de <span class="term" data-tr="гостинність">hospitalidad</span> que no ha cambiado en cientos de años.</p>
+  </div>
+</section>
+
+<section class="block" id="bloque1">
+  <p class="block-label">Bloque 1</p>
+  <h2 class="block-title">Tarea 1 — Test de comprensión</h2>
+  <div class="card" id="task1">
+    <div class="q-item" data-answer="a">
+      <p class="q-prompt">1. ¿Cuándo se originó el té según los historiadores?</p>
+      <label class="opt"><input type="radio" name="t1q1" value="a">Hace más de cinco mil años</label>
+      <label class="opt"><input type="radio" name="t1q1" value="b">Durante la dinastía Tang</label>
+      <label class="opt"><input type="radio" name="t1q1" value="c">En el siglo XVI</label>
+      <label class="opt"><input type="radio" name="t1q1" value="d">Hace aproximadamente dos mil años</label>
+    </div>
+    <div class="q-item" data-answer="b">
+      <p class="q-prompt">2. ¿Por qué consumían té los monjes budistas?</p>
+      <label class="opt"><input type="radio" name="t1q2" value="a">Por su sabor especial</label>
+      <label class="opt"><input type="radio" name="t1q2" value="b">Para mantenerse despiertos durante la meditación</label>
+      <label class="opt"><input type="radio" name="t1q2" value="c">Porque era la bebida oficial del Imperio</label>
+      <label class="opt"><input type="radio" name="t1q2" value="d">Porque tenía propiedades medicinales</label>
+    </div>
+    <div class="q-item" data-answer="c">
+      <p class="q-prompt">3. ¿Quiénes introdujeron el té en Europa?</p>
+      <label class="opt"><input type="radio" name="t1q3" value="a">Los mercaderes árabes</label>
+      <label class="opt"><input type="radio" name="t1q3" value="b">Los monjes budistas</label>
+      <label class="opt"><input type="radio" name="t1q3" value="c">Los portugueses</label>
+      <label class="opt"><input type="radio" name="t1q3" value="d">Los chinos directamente</label>
+    </div>
+    <div class="q-item" data-answer="c">
+      <p class="q-prompt">4. ¿Qué predicen los expertos para 2030?</p>
+      <label class="opt"><input type="radio" name="t1q4" value="a">Que China dejará de ser el mayor productor de té</label>
+      <label class="opt"><input type="radio" name="t1q4" value="b">Que el café superará al té en consumo mundial</label>
+      <label class="opt"><input type="radio" name="t1q4" value="c">Que el mercado del té alcanzará cien mil millones de dólares</label>
+      <label class="opt"><input type="radio" name="t1q4" value="d">Que el té se producirá en más de cien países</label>
+    </div>
+    <div class="q-item" data-answer="c">
+      <p class="q-prompt">5. ¿Qué representa ofrecer té en los países árabes?</p>
+      <label class="opt"><input type="radio" name="t1q5" value="a">Una tradición religiosa budista</label>
+      <label class="opt"><input type="radio" name="t1q5" value="b">Una costumbre comercial entre mercaderes</label>
+      <label class="opt"><input type="radio" name="t1q5" value="c">Un símbolo de hospitalidad</label>
+      <label class="opt"><input type="radio" name="t1q5" value="d">Una señal de riqueza y poder</label>
+    </div>
+  </div>
+
+  <h2 class="block-title" style="margin-top:40px;">Tarea 2 — Preguntas abiertas</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin-top:-14px;">Responde en voz alta — 3–4 frases cada una. Puedes anotar tus ideas aquí como apoyo.</p>
+  <div class="card">
+    <div class="open-q">
+      <p>1. El texto dice que el consumo de té ha crecido en países donde antes dominaba el café. ¿Crees que esto ocurre también en tu país? ¿Tú personalmente prefieres el té o el café?</p>
+      <textarea class="notes" placeholder="Tus notas..."></textarea>
+    </div>
+    <div class="open-q">
+      <p>2. En Japón existe una ceremonia del té que lleva siglos practicándose. ¿Conoces alguna tradición similar en tu cultura relacionada con la comida o la bebida?</p>
+      <textarea class="notes" placeholder="Tus notas..."></textarea>
+    </div>
+    <div class="open-q">
+      <p>3. La leyenda dice que el té fue descubierto por accidente. ¿Conoces algún otro descubrimiento famoso que ocurrió de forma accidental?</p>
+      <textarea class="notes" placeholder="Tus notas..."></textarea>
+    </div>
+    <div class="open-q">
+      <p>4. Los expertos predicen que el mercado del té crecerá enormemente. ¿Crees que las predicciones sobre el futuro son fiables? ¿Por qué sí o por qué no?</p>
+      <textarea class="notes" placeholder="Tus notas..."></textarea>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="bloque2">
+  <p class="block-label">Bloque 2</p>
+  <h2 class="block-title">Tarea 3 — Elige el tiempo correcto y conjuga</h2>
+  <div class="card" id="task3">
+    <p class="fillblank-sentence" data-answer="es">1. El té <input type="text" class="blank" data-idx="0"> (ser) la bebida más consumida después del agua.</p>
+    <p class="fillblank-sentence" data-answer="descubrió">2. Según la leyenda, el emperador Shennong <input type="text" class="blank" data-idx="1"> (descubrir) el té por accidente.</p>
+    <p class="fillblank-sentence" data-answer="consumían">3. Durante la dinastía Tang, los monjes <input type="text" class="blank" data-idx="2"> (consumir) té para mantenerse despiertos.</p>
+    <p class="fillblank-sentence" data-answer="ha crecido">4. En los últimos años, el consumo de té <input type="text" class="blank" data-idx="3"> (crecer) significativamente.</p>
+    <p class="fillblank-sentence" data-answer="introdujeron">5. Los portugueses <input type="text" class="blank" data-idx="4"> (introducir) el té en Europa en el siglo XVI.</p>
+    <p class="fillblank-sentence" data-answer="alcanzará">6. Para 2030, el mercado global del té <input type="text" class="blank" data-idx="5"> (alcanzar) cien mil millones de dólares.</p>
+    <p class="fillblank-sentence" data-answer="se produce">7. Hoy el té <input type="text" class="blank" data-idx="6"> (producirse) en más de cincuenta países.</p>
+    <p class="fillblank-sentence" data-answer="llegó" style="margin-bottom:0;">8a. Cuando el té <input type="text" class="blank" data-idx="7"> (llegar) a Europa,</p>
+    <p class="fillblank-sentence" data-answer="era" style="margin-top:4px;">8b. ya <input type="text" class="blank" data-idx="8"> (ser) muy popular en Asia.</p>
+  </div>
+
+  <h2 class="block-title" style="margin-top:40px;">Tarea 4 — Encuentra las 3 frases con error</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin-top:-14px;">Marca las 3 frases incorrectas y escribe la forma correcta.</p>
+  <div class="card" id="task4">
+    <div class="error-row" data-wrong="true" data-correction="compré">
+      <div class="error-row-top"><span class="error-statement">1. Ayer fui a una tienda y he comprado té verde japonés.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="false">
+      <div class="error-row-top"><span class="error-statement">2. Cuando era niño, mi abuela siempre preparaba té con miel.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="true" data-correction="ha crecido">
+      <div class="error-row-top"><span class="error-statement">3. Este año el consumo de té creció un 15% en España.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="false">
+      <div class="error-row-top"><span class="error-statement">4. Los mercaderes árabes llevaron el té a Oriente Medio hace siglos.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="false">
+      <div class="error-row-top"><span class="error-statement">5. Mañana voy a una ceremonia del té — nunca he ido a una antes.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="true" data-correction="introdujeron">
+      <div class="error-row-top"><span class="error-statement">6. En el siglo XVI, los portugueses han introducido el té en Europa.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+    <div class="error-row" data-wrong="false">
+      <div class="error-row-top"><span class="error-statement">7. Ahora mismo estoy bebiendo un té negro con leche.</span><button class="mark-btn">Marcar como incorrecta</button></div>
+      <input type="text" class="correction-input" placeholder="Forma correcta...">
+    </div>
+  </div>
+
+  <h2 class="block-title" style="margin-top:40px;">Tarea 5 — Traduce del ucraniano al español</h2>
+  <p style="color:var(--ink-soft);font-size:0.92rem;margin-top:-14px;">Usa los tiempos correctos.</p>
+  <div class="card" id="task5">
+    <p class="fillblank-sentence" data-answer="El té fue descubierto en China hace más de cinco mil años.">1. Чай був відкритий у Китаї більше п'яти тисяч років тому.<br><input type="text" class="blank" style="width:100%;text-align:left;margin-top:6px;" data-idx="0"></p>
+    <p class="fillblank-sentence" data-answer="Este año he probado el té verde japonés por primera vez.">2. Цього року я спробував японський зелений чай вперше.<br><input type="text" class="blank" style="width:100%;text-align:left;margin-top:6px;" data-idx="1"></p>
+    <p class="fillblank-sentence" data-answer="Cuando era pequeño, mi abuela siempre bebía té por las mañanas.">3. Коли я був маленьким, моя бабуся завжди пила чай вранці.<br><input type="text" class="blank" style="width:100%;text-align:left;margin-top:6px;" data-idx="2"></p>
+    <p class="fillblank-sentence" data-answer="En el futuro, más personas beberán té en lugar de café.">4. У майбутньому більше людей питимуть чай замість кави.<br><input type="text" class="blank" style="width:100%;text-align:left;margin-top:6px;" data-idx="3"></p>
+    <p class="fillblank-sentence" data-answer="Hoy el té se produce en más de cincuenta países." style="margin-bottom:0;">5. Сьогодні чай виробляється у більш ніж п'ятдесяти країнах.<br><input type="text" class="blank" style="width:100%;text-align:left;margin-top:6px;" data-idx="4"></p>
+  </div>
+
+  <h2 class="block-title" style="margin-top:40px;">Tarea 6 — Completa el texto</h2>
+  <div class="card" id="task6">
+    <div class="wordbank">
+      <span class="wb-chip">remontarse</span><span class="wb-chip">dominar</span><span class="wb-chip">introducir</span>
+      <span class="wb-chip">crecer</span><span class="wb-chip">consumir</span><span class="wb-chip">la hospitalidad</span>
+      <span class="wb-chip">la ceremonia</span><span class="wb-chip">sagrado</span><span class="wb-chip">el ritual</span>
+      <span class="wb-chip">los mercaderes</span>
+    </div>
+    <p class="fillblank-sentence" data-answer="se remonta">«La historia del té <input type="text" class="blank" data-idx="0"> a hace más de cinco mil años.</p>
+    <p class="fillblank-sentence" data-answer="se consumía">Durante siglos, solo <input type="text" class="blank" data-idx="1"> en Asia,</p>
+    <p class="fillblank-sentence" data-answer="los mercaderes">hasta que <input type="text" class="blank" data-idx="2"> árabes y persas</p>
+    <p class="fillblank-sentence" data-answer="introdujeron">lo <input type="text" class="blank" data-idx="3"> en Oriente Medio. Más tarde llegó a Europa.</p>
+    <p class="fillblank-sentence" data-answer="se consume">Hoy el té <input type="text" class="blank" data-idx="4"> en todo el mundo —</p>
+    <p class="fillblank-sentence" data-answer="ha crecido">en los últimos años su consumo <input type="text" class="blank" data-idx="5"> enormemente</p>
+    <p class="fillblank-sentence" data-answer="dominaba">incluso en países donde antes <input type="text" class="blank" data-idx="6"> el café.</p>
+    <p class="fillblank-sentence" data-answer="un ritual">Pero el té no es solo una bebida — es también <input type="text" class="blank" data-idx="7">.</p>
+    <p class="fillblank-sentence" data-answer="la ceremonia">En Japón, <input type="text" class="blank" data-idx="8"> del té es una tradición casi</p>
+    <p class="fillblank-sentence" data-answer="sagrada"><input type="text" class="blank" data-idx="9">.</p>
+    <p class="fillblank-sentence" data-answer="hospitalidad" style="margin-bottom:0;">Y en los países árabes, ofrecerlo a un invitado es un gesto de <input type="text" class="blank" data-idx="10"> que no ha cambiado en siglos.»</p>
+  </div>
+</section>
+
+<div class="check-area">
+  <button class="check-btn" id="check-btn">Comprobar respuestas</button>
+  <p id="score-summary"></p>
+</div>
+
+<section class="glossary">
+  <h2 class="block-title">Glosario</h2>
+  <table class="gloss" id="gloss-table"></table>
+</section>
+
+<script>
+const GLOSSARY = [
+  ["remontarse a", "сягати, сходити до"],
+  ["la leyenda", "легенда"],
+  ["la hoja", "листок"],
+  ["la dinastía", "династія"],
+  ["el monje budista", "буддійський монах"],
+  ["la meditación", "медитація"],
+  ["el mercader", "торговець"],
+  ["introducir", "запровадити, ввести"],
+  ["el productor", "виробник"],
+  ["significativamente", "значно, суттєво"],
+  ["dominar", "домінувати, переважати"],
+  ["predecir", "передбачати"],
+  ["alcanzar", "досягати"],
+  ["el ritual", "ритуал"],
+  ["la ceremonia", "церемонія"],
+  ["la hospitalidad", "гостинність"],
+  ["sagrado/a", "священний"],
+  ["el invitado", "гість"],
+];
+const goss = document.getElementById('gloss-table');
+GLOSSARY.forEach(([es, uk]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${es}</td><td>${uk}</td>`;
+  goss.appendChild(tr);
+});
+
+// term click reveal
+document.querySelectorAll('.term').forEach(el => {
+  el.addEventListener('click', () => el.classList.toggle('shown'));
+});
+
+// Task 1: radio MCQ visual selection
+document.querySelectorAll('#task1 label.opt input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    const item = inp.closest('.q-item');
+    item.querySelectorAll('label.opt').forEach(l => l.classList.remove('active'));
+    inp.closest('label').classList.add('active');
+  });
+});
+
+// Task 4: mark-wrong toggles
+document.querySelectorAll('#task4 .error-row').forEach(row => {
+  row.querySelector('.mark-btn').addEventListener('click', () => {
+    row.classList.toggle('marked');
+    row.querySelector('.mark-btn').classList.toggle('active');
+  });
+});
+
+function normalize(str){
+  return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¡!¿?.,;]/g,'');
+}
+
+document.getElementById('check-btn').addEventListener('click', () => {
+  let correctCount = 0, answeredCount = 0;
+
+  // Task 1
+  document.querySelectorAll('#task1 .q-item').forEach(item => {
+    const checked = item.querySelector('input:checked');
+    item.querySelectorAll('label.opt').forEach(l => l.classList.remove('correct','incorrect'));
+    if(!checked) return;
+    answeredCount++;
+    const correctVal = item.dataset.answer;
+    const label = checked.closest('label');
+    if(checked.value === correctVal){
+      label.classList.add('correct');
+      correctCount++;
+    } else {
+      label.classList.add('incorrect');
+      item.querySelector(`input[value="${correctVal}"]`).closest('label').classList.add('correct');
+    }
+  });
+
+  // Task 3, 5, 6: fill blanks (any card containing .fillblank-sentence with an <input class="blank">)
+  document.querySelectorAll('.fillblank-sentence').forEach(sentence => {
+    const input = sentence.querySelector('input.blank');
+    if(!input) return;
+    input.classList.remove('correct','incorrect');
+    const existingHint = sentence.querySelector('.blank-answer');
+    if(existingHint) existingHint.remove();
+    const val = input.value;
+    if(!val || val.trim() === '') return;
+    answeredCount++;
+    const correctVal = sentence.dataset.answer;
+    if(normalize(val) === normalize(correctVal)){
+      input.classList.add('correct');
+      correctCount++;
+    } else {
+      input.classList.add('incorrect');
+      const hint = document.createElement('span');
+      hint.className = 'blank-answer';
+      hint.textContent = 'Respuesta orientativa: ' + correctVal;
+      sentence.appendChild(hint);
+    }
+  });
+
+  // Task 4: error rows
+  document.querySelectorAll('#task4 .error-row').forEach(row => {
+    const markBtn = row.querySelector('.mark-btn');
+    markBtn.classList.remove('correct','incorrect');
+    const isMarked = row.classList.contains('marked');
+    const isWrong = row.dataset.wrong === 'true';
+    if(!isMarked) return; // only grade rows the student actually flagged
+    answeredCount++;
+    if(isWrong){
+      markBtn.classList.add('correct');
+      correctCount++;
+      // check correction text if provided
+      const corrInput = row.querySelector('.correction-input');
+      const val = corrInput.value.trim();
+      if(val !== ''){
+        answeredCount++;
+        if(normalize(val).includes(normalize(row.dataset.correction))){
+          corrInput.style.borderColor = 'var(--right)';
+          correctCount++;
+        } else {
+          corrInput.style.borderColor = 'var(--wrong)';
+          corrInput.placeholder = 'Forma correcta: ' + row.dataset.correction;
+        }
+      }
+    } else {
+      markBtn.classList.add('incorrect');
+    }
+  });
+
+  const summary = document.getElementById('score-summary');
+  if(answeredCount === 0){
+    summary.textContent = 'Todavía no has respondido ninguna pregunta.';
+  } else {
+    summary.textContent = `Has respondido correctamente ${correctCount} de ${answeredCount} preguntas contestadas.`;
+  }
+  document.getElementById('check-btn').scrollIntoView({behavior:'smooth', block:'center'});
+});
+</script>
+
+</body>
+</html>
