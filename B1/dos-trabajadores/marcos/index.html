@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Marcos — Nexus Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDEFF2;
+    --card:#FFFFFF;
+    --ink:#1B2A41;
+    --ink-soft:#5A6B7D;
+    --role:#2F6E70;
+    --role-soft:#DCEBEA;
+    --role-dark:#1F4C4D;
+    --line:#D6DCE1;
+    --wrong:#C0483B;
+    --right:#3C8A5C;
+    --amber:#C08A2E;
+    --neg:#C0483B;
+    --pos:#3C8A5C;
+    --neu:#8A7A4A;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;padding-bottom:90px;}
+  .wrap{max-width:780px;margin:0 auto;padding:0 24px;}
+  header.hero{max-width:780px;margin:0 auto;padding:56px 24px 30px;}
+  .role-tag{display:inline-block;background:var(--role);color:#fff;font-weight:600;font-size:0.85rem;padding:5px 14px;border-radius:100px;margin-bottom:16px;}
+  header.hero h1{font-family:'Newsreader',serif;font-weight:600;font-size:2.3rem;line-height:1.2;margin:0 0 12px;max-width:18ch;}
+  header.hero p.lede{font-size:1.02rem;color:var(--ink-soft);max-width:58ch;margin:0;}
+
+  section.block{max-width:780px;margin:0 auto 52px;padding:0 24px;}
+  .block-label{font-size:0.85rem;color:var(--role);font-weight:600;margin-bottom:6px;}
+  h2.block-title{font-family:'Newsreader',serif;font-weight:600;font-size:1.55rem;margin:0 0 8px;}
+  p.block-note{color:var(--ink-soft);font-size:0.92rem;margin:0 0 18px;}
+
+  .card{background:var(--card);border-radius:14px;padding:26px 28px;border:1px solid var(--line);}
+
+  /* draft flag */
+  .draft-flag{
+    display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:600;color:var(--amber);
+    background:#FBF1DD;border:1px solid #E9D6A8;padding:4px 10px;border-radius:100px;margin-bottom:14px;
+  }
+
+  /* context / comunicado */
+  .context-text{font-size:1rem;margin:0 0 22px;}
+  .sms-card{
+    background:var(--ink);color:#fff;border-radius:14px;padding:20px 22px;margin-bottom:22px;
+  }
+  .sms-card .sms-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:0.85rem;opacity:0.75;}
+  .sms-card .sms-body{font-size:0.98rem;white-space:pre-line;}
+  .sms-card .sms-sign{margin-top:10px;font-size:0.85rem;opacity:0.7;}
+
+  .opinion-list{list-style:none;margin:0;padding:0;}
+  .opinion-list li{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:10px 0;border-bottom:1px solid var(--line);font-size:0.95rem;
+  }
+  .opinion-list li:last-child{border-bottom:none;}
+  .valence{
+    flex-shrink:0;font-size:0.75rem;font-weight:700;padding:4px 12px;border-radius:100px;color:#fff;
+  }
+  .valence.neg{background:var(--neg);}
+  .valence.pos{background:var(--pos);}
+  .valence.neu{background:var(--neu);}
+  .opinion-note{color:var(--ink-soft);font-size:0.88rem;margin:14px 0 0;}
+
+  .todo-list{margin:0;padding-left:20px;color:var(--ink-soft);font-size:0.94rem;}
+  .todo-list li{margin-bottom:6px;}
+
+  /* profile card */
+  .profile-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;}
+  .profile-top{background:var(--role);color:#fff;padding:26px 28px;display:flex;align-items:center;gap:18px;}
+  .avatar{
+    width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.18);
+    display:flex;align-items:center;justify-content:center;font-family:'Newsreader',serif;
+    font-weight:600;font-size:1.4rem;flex-shrink:0;border:1.5px solid rgba(255,255,255,0.4);
+  }
+  .profile-top h3{font-family:'Newsreader',serif;font-weight:600;font-size:1.4rem;margin:0 0 2px;}
+  .profile-top p{margin:0;font-size:0.92rem;opacity:0.9;}
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  .profile-field{padding:16px 28px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);}
+  .profile-field:nth-child(2n){border-right:none;}
+  .profile-field .f-label{font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);margin:0 0 4px;}
+  .profile-field .f-value{margin:0;font-size:0.96rem;}
+  .secret-box{margin:0;padding:18px 28px;background:#FBF4E8;border-top:2px dashed var(--amber);display:flex;gap:12px;align-items:flex-start;}
+  .secret-box .lock{font-size:1.3rem;flex-shrink:0;}
+  .secret-box .f-label{font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--role-dark);margin:0 0 4px;font-weight:600;}
+  .secret-box .f-value{margin:0 0 8px;font-size:0.95rem;}
+  .secret-box .f-usage{margin:0;font-size:0.85rem;font-weight:600;color:var(--role-dark);}
+
+  .presentation-checklist{list-style:none;margin:0 0 18px;padding:0;}
+  .presentation-checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:0.92rem;color:var(--ink-soft);}
+  .presentation-checklist input[type=checkbox]{margin-top:3px;width:16px;height:16px;accent-color:var(--role);flex-shrink:0;}
+  textarea.presentation-input{
+    width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;
+    padding:14px;font-family:'IBM Plex Sans',sans-serif;font-size:0.98rem;resize:vertical;
+  }
+
+  /* task1 */
+  .fillblank-sentence{margin-bottom:6px;font-size:1.02rem;}
+  input.blank{
+    border:none;border-bottom:2px solid var(--role);background:transparent;
+    font-family:'IBM Plex Sans',sans-serif;font-size:1rem;color:var(--ink);
+    padding:2px 4px;width:160px;text-align:center;
+  }
+  input.blank.correct{border-bottom-color:var(--right);color:var(--right);font-weight:600;}
+  input.blank.incorrect{border-bottom-color:var(--wrong);color:var(--wrong);}
+  .blank-answer{display:block;font-size:0.82rem;color:var(--right);margin-top:2px;}
+  .emotion-tag{
+    display:inline-block;font-size:0.76rem;color:var(--role-dark);background:var(--role-soft);
+    padding:2px 9px;border-radius:100px;margin:2px 0 16px;
+  }
+  .t1-item:last-child .emotion-tag{margin-bottom:0;}
+
+  /* task2 rework */
+  .opinion-line{display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:1.02rem;flex-wrap:wrap;}
+  .opinion-line input{
+    border:none;border-bottom:2px solid var(--role);background:transparent;
+    font-family:'IBM Plex Sans',sans-serif;font-size:1rem;padding:2px 6px;min-width:160px;
+  }
+  .quote-stem{margin-bottom:14px;font-size:0.98rem;}
+  .quote-stem input{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-top:4px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:0.95rem;
+  }
+  .emotion-check-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-top:8px;
+  }
+  .emotion-check-grid label{
+    display:flex;align-items:center;gap:8px;font-size:0.92rem;padding:6px 0;cursor:pointer;
+  }
+  .emotion-check-grid input{width:16px;height:16px;accent-color:var(--role);}
+
+  /* task3 toolkit */
+  .toolkit-list{list-style:none;margin:0 0 20px;padding:0;}
+  .toolkit-list li{
+    display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);
+    font-size:0.92rem;cursor:pointer;
+  }
+  .toolkit-list li:last-child{border-bottom:none;}
+  .toolkit-list input[type=checkbox]{margin-top:3px;width:16px;height:16px;accent-color:var(--role);flex-shrink:0;}
+  .toolkit-list li.used span{text-decoration:line-through;color:var(--ink-soft);opacity:0.6;}
+
+  /* chat */
+  .chat{display:flex;flex-direction:column;gap:14px;}
+  .bubble-row{display:flex;flex-direction:column;max-width:78%;}
+  .bubble-row.left{align-self:flex-start;align-items:flex-start;}
+  .bubble-row.right{align-self:flex-end;align-items:flex-end;}
+  .bubble-name{font-size:0.78rem;font-weight:600;color:var(--ink-soft);margin-bottom:4px;padding:0 4px;}
+  .bubble{border-radius:16px;padding:12px 16px;font-size:0.98rem;}
+  .bubble-row.left .bubble{background:var(--role-soft);border-bottom-left-radius:4px;}
+  .bubble-row.right .bubble{background:#EFE6D6;border-bottom-right-radius:4px;}
+  .bubble.fixed{font-style:italic;}
+  textarea.bubble-input{
+    width:220px;min-width:180px;border:none;background:transparent;
+    font-family:'IBM Plex Sans',sans-serif;font-size:0.98rem;color:var(--ink);resize:vertical;min-height:36px;
+  }
+  textarea.bubble-input:focus{outline:none;}
+
+  .ask-list{list-style:none;margin:0;padding:0;}
+  .ask-list li{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .ask-list li:last-child{border-bottom:none;}
+  .ask-list input[type=checkbox]{margin-top:4px;width:17px;height:17px;accent-color:var(--role);flex-shrink:0;}
+
+  .thesis{margin-bottom:26px;padding-bottom:26px;border-bottom:1px solid var(--line);}
+  .thesis:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+  .thesis-text{font-family:'Newsreader',serif;font-style:italic;font-size:1.08rem;margin:0 0 14px;}
+  table.thesis-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+  table.thesis-table th{color:var(--ink-soft);font-weight:500;padding:4px 4px 10px;text-align:center;}
+  table.thesis-table th:first-child{text-align:left;}
+  table.thesis-table td{text-align:center;padding:6px 4px;}
+  table.thesis-table td:first-child{text-align:left;font-weight:600;font-size:0.88rem;width:140px;}
+  table.thesis-table input[type=radio]{width:17px;height:17px;accent-color:var(--role);}
+
+  .phrase-box{margin-top:8px;background:var(--role-soft);border-radius:10px;padding:18px 22px;}
+  .phrase-box p{margin:0 0 8px;font-style:italic;color:var(--role-dark);}
+  .phrase-box p:last-child{margin-bottom:0;}
+
+  /* crossword */
+  .cw-shell{position:relative;min-height:120px;}
+  .cw-curtain{text-align:center;padding:60px 20px;}
+  .cw-curtain p{color:var(--ink-soft);margin-bottom:20px;}
+  button.start-btn{
+    font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:1.05rem;
+    background:var(--amber);color:#fff;border:none;border-radius:100px;padding:16px 38px;cursor:pointer;
+  }
+  button.start-btn:hover{background:#A9781F;}
+  .cw-content{display:none;}
+  .cw-content.active{display:block;}
+  .cw-timer{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  .cw-timer .time{font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:1.4rem;color:var(--role);}
+  button.cw-check{
+    font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:0.95rem;
+    background:var(--ink);color:#fff;border:none;border-radius:100px;padding:10px 22px;cursor:pointer;
+  }
+  .cw-grid{display:grid;gap:2px;margin:0 auto 22px;overflow-x:auto;width:max-content;max-width:100%;}
+  .cw-cell{width:30px;height:30px;position:relative;}
+  .cw-cell.void{background:transparent;}
+  .cw-cell.active input{
+    width:100%;height:100%;border:1px solid var(--ink-soft);text-align:center;
+    text-transform:uppercase;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:0.95rem;
+    padding:0;background:#fff;color:var(--ink);
+  }
+  .cw-cell.active input.correct{background:#E2F1E7;border-color:var(--right);color:var(--right);}
+  .cw-cell.active input.incorrect{background:#FBE7E4;border-color:var(--wrong);color:var(--wrong);}
+  .cw-num{position:absolute;top:0;left:2px;font-size:8px;color:var(--role);font-weight:700;pointer-events:none;}
+  .clue-cols{display:flex;gap:36px;flex-wrap:wrap;}
+  .clue-col h3{font-size:0.92rem;margin:0 0 10px;color:var(--role-dark);}
+  .clue-col ol{margin:0;padding-left:18px;font-size:0.88rem;color:var(--ink-soft);}
+  .clue-col li{margin-bottom:8px;}
+  .cw-result{margin-top:18px;font-weight:600;}
+  .cw-winner{margin-top:14px;padding:16px;border-radius:10px;background:#E2F1E7;color:var(--right);font-weight:700;text-align:center;animation:pop .4s ease;}
+  @keyframes pop{from{transform:scale(0.9);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+  .check-area{max-width:780px;margin:0 auto;padding:0 24px;text-align:center;}
+  button.check-btn{
+    font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:1.05rem;
+    background:var(--ink);color:#fff;border:none;border-radius:100px;padding:16px 42px;cursor:pointer;
+  }
+  button.check-btn:hover{background:var(--role-dark);}
+  #score-summary{margin-top:20px;font-weight:600;font-size:1.05rem;}
+
+  /* results / telegram */
+  .results-card{text-align:left;}
+  .results-card label{display:block;font-size:0.85rem;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+  .results-card input[type=text]{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:0.96rem;margin-bottom:16px;
+  }
+  .results-btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;justify-content:center;}
+  button.res-btn{
+    font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:0.92rem;
+    border-radius:100px;padding:11px 20px;cursor:pointer;border:1.5px solid var(--role);
+  }
+  button.res-copy{background:transparent;color:var(--role);}
+  button.res-copy:hover{background:var(--role-soft);}
+  button.res-telegram{background:#2AA9DE;color:#fff;border-color:#2AA9DE;}
+  button.res-telegram:hover{background:#2391C2;}
+  pre.results-preview{
+    background:#F6F7F8;border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    font-family:'IBM Plex Sans',sans-serif;font-size:0.88rem;white-space:pre-wrap;color:var(--ink-soft);margin:0;
+  }
+  .copy-toast{
+    display:none;margin-top:10px;font-size:0.85rem;color:var(--right);font-weight:600;
+  }
+  .copy-toast.show{display:block;}
+
+  .teacher-panel{margin-top:32px;padding-top:28px;border-top:1px dashed var(--line);}
+  .teacher-panel h3{font-family:'Newsreader',serif;font-weight:600;font-size:1.15rem;margin:0 0 6px;}
+  .teacher-panel p.hint{color:var(--ink-soft);font-size:0.9rem;margin:0 0 14px;}
+  textarea.paste-input{
+    width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:0.94rem;resize:vertical;margin-bottom:12px;
+  }
+  .teacher-panel .results-btn-row{margin-bottom:0;}
+  button.res-show{background:var(--ink);color:#fff;border-color:var(--ink);}
+  button.res-show:hover{background:var(--role-dark);border-color:var(--role-dark);}
+  .parsed-result{display:none;margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  .parsed-result.show{display:block;}
+  .parsed-result table{width:100%;border-collapse:collapse;}
+  .parsed-result td{padding:11px 16px;border-bottom:1px solid var(--line);font-size:0.92rem;vertical-align:top;}
+  .parsed-result tr:last-child td{border-bottom:none;}
+  .parsed-result td:first-child{font-weight:600;color:var(--role-dark);width:42%;background:var(--role-soft);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="role-tag">Marcos</span>
+  <h1>Nexus Solutions cambia de rumbo</h1>
+  <p class="lede">Tu empresa acaba de anunciar una reestructuración de equipos. Completa tus reacciones, predice las de tu compañera y preparaos para hablar en voz alta.</p>
+</header>
+
+<!-- CONTEXTO -->
+<section class="block">
+  <p class="block-label">Contexto</p>
+  <h2 class="block-title">¿Qué está pasando?</h2>
+  <div class="card">
+    <p class="context-text">Nexus Solutions es la empresa donde trabajáis Marcos y Elena. Esta mañana, la dirección ha enviado un comunicado anunciando cambios en la organización de los equipos: más trabajo híbrido, nuevos equipos creativos con autonomía y algunos roles de gestión que pasarán a ser puestos de «coordinación» sin equipo fijo. Nadie sabe todavía los detalles exactos — y las reacciones dentro de la empresa son muy distintas según a quién le preguntes.</p>
+
+    <span class="draft-flag">✏️ Borrador — pide al profesor el texto y la opinión reales para sustituir esto</span>
+    <div class="sms-card">
+      <div class="sms-head">📩 Comunicado interno · Dirección de Nexus Solutions</div>
+      <div class="sms-body">Estimado equipo:
+
+A partir de enero, adoptaremos un modelo de trabajo híbrido en todos los departamentos. Además, crearemos varios equipos creativos con plena autonomía sobre sus proyectos. Algunos roles de gestión pasarán a funciones de coordinación transversal, sin equipo asignado de forma permanente.
+
+Compartiremos más detalles en las próximas semanas. Gracias por vuestra comprensión.</div>
+      <div class="sms-sign">— Dirección de Nexus Solutions</div>
+    </div>
+
+    <p class="block-note" style="margin-bottom:10px;">Así valoramos nosotros el comunicado — úsalo como inspiración, no lo copies tal cual: construye tú tus propias frases.</p>
+    <ul class="opinion-list">
+      <li><span>el modelo de trabajo híbrido</span><span class="valence pos">Positivo</span></li>
+      <li><span>la falta de consulta previa a los empleados</span><span class="valence neg">Negativo</span></li>
+      <li><span>los nuevos equipos creativos con autonomía</span><span class="valence pos">Positivo</span></li>
+      <li><span>el nuevo rol de «coordinador» sin equipo</span><span class="valence neg">Negativo</span></li>
+      <li><span>la falta de detalles concretos por ahora</span><span class="valence neu">Neutral</span></li>
+    </ul>
+    <p class="opinion-note">Por ejemplo: «Me parece bien que apuesten por el modelo híbrido, pero me molesta que no hayan consultado a los empleados antes de anunciarlo.»</p>
+
+    <p class="block-note" style="margin:20px 0 6px;font-weight:600;color:var(--ink);">Qué vas a hacer tú, Marcos, en esta ficha:</p>
+    <ol class="todo-list">
+      <li>Presentarte a Elena como tu personaje (Tarea 0).</li>
+      <li>Reaccionar al comunicado con tus propias frases (Tarea 1).</li>
+      <li>Escuchar las reacciones de Elena y anotar lo que sientes que ella expresa (Tarea 2).</li>
+      <li>Hablar con ella sobre el comunicado — y decidir cuándo contarle tu secreto (Tarea 3).</li>
+      <li>Haceros preguntas en voz alta (Tarea 4) y comparar vuestra opinión sobre 8 tesis (Tarea 5).</li>
+      <li>Terminar con un crucigrama por parejas, contrarreloj (Tarea 6).</li>
+    </ol>
+  </div>
+</section>
+
+<!-- FICHA DE PERSONAJE -->
+<section class="block">
+  <p class="block-label">Tu personaje</p>
+  <h2 class="block-title">Ficha de Marcos</h2>
+  <p class="block-note">Lee tu ficha antes de empezar. Usa esta información para responder «como Marcos» durante todas las tareas.</p>
+  <div class="profile-card">
+    <div class="profile-top">
+      <div class="avatar">MF</div>
+      <div><h3>Marcos Ferreira</h3><p>Jefe de equipo · Departamento de Operaciones</p></div>
+    </div>
+    <div class="profile-grid">
+      <div class="profile-field"><p class="f-label">Edad</p><p class="f-value">38 años</p></div>
+      <div class="profile-field"><p class="f-label">Años en Nexus Solutions</p><p class="f-value">9 años</p></div>
+      <div class="profile-field"><p class="f-label">Situación personal</p><p class="f-value">Casado, dos hijos pequeños, hipoteca a 20 años.</p></div>
+      <div class="profile-field"><p class="f-label">Carácter</p><p class="f-value">Prudente, leal, algo resistente al cambio.</p></div>
+      <div class="profile-field"><p class="f-label">Cómo te sientes ante el anuncio</p><p class="f-value">Inquieto — no soportas la incertidumbre.</p></div>
+      <div class="profile-field"><p class="f-label">Lo que más valoras del trabajo</p><p class="f-value">La estabilidad y tener un equipo del que eres responsable.</p></div>
+    </div>
+    <div class="secret-box">
+      <span class="lock">🤫</span>
+      <div>
+        <p class="f-label">Tu secreto</p>
+        <p class="f-value">Escuchaste sin querer una conversación en RRHH: es casi seguro que te van a ofrecer el puesto de «coordinador», sin equipo propio. No se lo has contado a nadie todavía — decide tú cuándo revelarlo.</p>
+        <p class="f-usage">📌 Te servirá para la Tarea 3 (el diálogo).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAREA 0 -->
+<section class="block">
+  <p class="block-label">Tarea 0</p>
+  <h2 class="block-title">Preséntate</h2>
+  <p class="block-note">Antes de reaccionar al comunicado, preséntate a tu compañera como Marcos. Puedes incluir:</p>
+  <div class="card">
+    <ul class="presentation-checklist">
+      <li><input type="checkbox"><span>Tu nombre y tu puesto en Nexus Solutions</span></li>
+      <li><input type="checkbox"><span>Cuánto tiempo llevas en la empresa</span></li>
+      <li><input type="checkbox"><span>Cómo te sentías con tu trabajo antes del anuncio</span></li>
+      <li><input type="checkbox"><span>Un rasgo de tu carácter</span></li>
+      <li><input type="checkbox"><span>Algo de tu vida personal, si quieres compartirlo</span></li>
+    </ul>
+    <textarea class="presentation-input" placeholder="Escribe aquí tu autopresentación (4-6 frases) y practícala en voz alta antes de empezar..."></textarea>
+  </div>
+</section>
+
+<!-- TAREA 1 -->
+<section class="block">
+  <p class="block-label">Tarea 1</p>
+  <h2 class="block-title">¿Cómo reaccionas?</h2>
+  <p class="block-note">Completa con la forma correcta del subjuntivo. Debajo de cada frase verás qué emoción expresa — te será útil cuando la leas en voz alta en la Tarea 3.</p>
+  <div class="card" id="task1">
+    <div class="t1-item">
+      <p class="fillblank-sentence" data-answer="haya tomado">1. Me molesta que la empresa <input type="text" class="blank" data-idx="0"> (tomar) estas decisiones sin consultar a nadie.</p>
+      <span class="emotion-tag">emoción: molestia</span>
+    </div>
+    <div class="t1-item">
+      <p class="fillblank-sentence" data-answer="sea">2. No creo que trabajar desde casa <input type="text" class="blank" data-idx="1"> (ser) más productivo.</p>
+      <span class="emotion-tag">emoción: duda</span>
+    </div>
+    <div class="t1-item">
+      <p class="fillblank-sentence" data-answer="explique">3. Espero que el director me <input type="text" class="blank" data-idx="2"> (explicar) personalmente qué pasará.</p>
+      <span class="emotion-tag">emoción: esperanza</span>
+    </div>
+    <div class="t1-item">
+      <p class="fillblank-sentence" data-answer="se mantenga">4. Es importante que el equipo <input type="text" class="blank" data-idx="3"> (mantenerse) unido durante este proceso.</p>
+      <span class="emotion-tag">emoción: necesidad</span>
+    </div>
+    <div class="t1-item">
+      <p class="fillblank-sentence" data-answer="afecte">5. Ojalá este cambio no <input type="text" class="blank" data-idx="4"> (afectar) negativamente a mi posición.</p>
+      <span class="emotion-tag">emoción: deseo</span>
+    </div>
+  </div>
+</section>
+
+<!-- TAREA 2 -->
+<section class="block">
+  <p class="block-label">Tarea 2</p>
+  <h2 class="block-title">Escucha a tu compañera</h2>
+  <p class="block-note">Cuando Elena lea en voz alta sus frases de la Tarea 1, completa esto mientras escuchas.</p>
+  <div class="card">
+    <div class="opinion-line">
+      <span>La opinión general de Elena es:</span>
+      <input type="text" id="t2-opinion" placeholder="positiva / negativa / mixta...">
+    </div>
+    <p class="quote-stem">Ella dice que <input type="text" placeholder="..."></p>
+    <p class="quote-stem">Le preocupa que <input type="text" placeholder="..."></p>
+    <p class="quote-stem">Le alegra que <input type="text" placeholder="..."></p>
+    <p class="quote-stem" style="margin-bottom:0;">Espera que <input type="text" placeholder="..."></p>
+
+    <p style="margin:22px 0 4px;font-weight:600;">¿Qué emociones ha mostrado Elena?</p>
+    <p class="block-note" style="margin-bottom:0;">Marca las que reconozcas mientras la escuchas.</p>
+    <div class="emotion-check-grid">
+      <label><input type="checkbox"><span>Molestia</span></label>
+      <label><input type="checkbox"><span>Duda</span></label>
+      <label><input type="checkbox"><span>Esperanza</span></label>
+      <label><input type="checkbox"><span>Necesidad</span></label>
+      <label><input type="checkbox"><span>Deseo</span></label>
+      <label><input type="checkbox"><span>Alegría</span></label>
+      <label><input type="checkbox"><span>Entusiasmo</span></label>
+      <label><input type="checkbox"><span>Sorpresa</span></label>
+      <label><input type="checkbox"><span>Admiración</span></label>
+      <label><input type="checkbox"><span>Alivio</span></label>
+    </div>
+  </div>
+</section>
+
+<!-- TAREA 3 -->
+<section class="block">
+  <p class="block-label">Tarea 3</p>
+  <h2 class="block-title">El diálogo</h2>
+  <p class="block-note">Completad juntos este diálogo, cada uno desde su personaje. Sin pistas — usad vuestra imaginación.</p>
+  <div class="card">
+    <p style="font-weight:600;margin:0 0 10px;">Intenta usar durante la conversación:</p>
+    <ul class="toolkit-list" id="toolkit">
+      <li><input type="checkbox"><span>Pretérito perfecto de subjuntivo (haya + participio)</span></li>
+      <li><input type="checkbox"><span>Expresar duda (dudo que… / no creo que…)</span></li>
+      <li><input type="checkbox"><span>Expresar sorpresa (me sorprende que… / no esperaba que…)</span></li>
+      <li><input type="checkbox"><span>Hacer una pregunta directa</span></li>
+      <li><input type="checkbox"><span>Proponer algo (¿Y si…? / propongo que…)</span></li>
+      <li><input type="checkbox"><span>Mostrar empatía (entiendo que… / debe de ser difícil…)</span></li>
+    </ul>
+    <div class="chat">
+      <div class="bubble-row left"><span class="bubble-name">Elena</span><div class="bubble fixed">Marcos, ¿ya has leído el comunicado? ¿Qué te parece?</div></div>
+      <div class="bubble-row right"><span class="bubble-name">Marcos</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row left"><span class="bubble-name">Elena</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row right"><span class="bubble-name">Marcos</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row left"><span class="bubble-name">Elena</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row right"><span class="bubble-name">Marcos</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row left"><span class="bubble-name">Elena</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row right"><span class="bubble-name">Marcos</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+      <div class="bubble-row left"><span class="bubble-name">Elena</span><div class="bubble"><textarea class="bubble-input"></textarea></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TAREA 4 -->
+<section class="block">
+  <p class="block-label">Tarea 4</p>
+  <h2 class="block-title">Pregúntale al otro</h2>
+  <p class="block-note">Marca cada pregunta cuando se la hayas hecho a tu compañera en voz alta.</p>
+  <div class="card">
+    <ul class="ask-list">
+      <li><input type="checkbox"><span>¿Qué es exactamente lo que más te ilusiona del nuevo modelo de equipos?</span></li>
+      <li><input type="checkbox"><span>¿Te preocupa algo de todo esto, aunque sea un poco?</span></li>
+      <li><input type="checkbox"><span>Si te ofrecieran liderar un equipo nuevo, ¿lo aceptarías inmediatamente?</span></li>
+      <li><input type="checkbox"><span>¿Crees que yo debería pedir hablar directamente con el director?</span></li>
+      <li><input type="checkbox"><span>¿Qué harías tú si te ofrecieran un puesto sin equipo propio?</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- TAREA 5 -->
+<section class="block">
+  <p class="block-label">Tarea 5</p>
+  <h2 class="block-title">¿Estás de acuerdo?</h2>
+  <p class="block-note">Para cada tesis: marca tu posición, predice la de tu compañera, y luego comparad en voz alta.</p>
+  <div class="card" id="task5"></div>
+  <div class="phrase-box">
+    <p>«Yo marqué... porque...»</p>
+    <p>«Me sorprende que tú hayas marcado... porque pensaba que...»</p>
+    <p>«Estoy de acuerdo / en desacuerdo con que...»</p>
+    <p>«Es curioso que los dos hayamos elegido...»</p>
+  </div>
+</section>
+
+<!-- TAREA 6 -->
+<section class="block">
+  <p class="block-label">Tarea 6</p>
+  <h2 class="block-title">El crucigrama</h2>
+  <p class="block-note">Todas las palabras han aparecido en lo que habéis leído y hablado — deberíais reconocerlas sin problema. Pulsad «Empezar» al mismo tiempo.</p>
+  <div class="card cw-shell">
+    <div class="cw-curtain" id="cw-curtain">
+      <p>El cronómetro empieza en cuanto pulses el botón.</p>
+      <button class="start-btn" id="cw-start">▶ Empezar el crucigrama</button>
+    </div>
+    <div class="cw-content" id="cw-content">
+      <div class="cw-timer">
+        <span class="time" id="cw-time">00:00</span>
+        <button class="cw-check" id="cw-check">Comprobar</button>
+      </div>
+      <div class="cw-grid" id="cw-grid"></div>
+      <div class="clue-cols">
+        <div class="clue-col"><h3>Horizontal</h3><ol id="clues-h"></ol></div>
+        <div class="clue-col"><h3>Vertical</h3><ol id="clues-v"></ol></div>
+      </div>
+      <p class="cw-result" id="cw-result"></p>
+      <div id="cw-winner"></div>
+    </div>
+  </div>
+</section>
+
+<div class="check-area">
+  <button class="check-btn" id="check-btn">Comprobar respuestas</button>
+  <p id="score-summary"></p>
+</div>
+
+<!-- RESULTADOS -->
+<section class="block">
+  <p class="block-label">Resultados</p>
+  <h2 class="block-title">Enviar tus resultados</h2>
+  <div class="card results-card">
+    <label for="student-name">Tu nombre</label>
+    <input type="text" id="student-name" placeholder="Escribe tu nombre...">
+    <div class="results-btn-row">
+      <button class="res-btn res-copy" id="res-copy">📋 Copiar resultados</button>
+      <button class="res-btn res-telegram" id="res-telegram">✈️ Enviar por Telegram</button>
+    </div>
+    <pre class="results-preview" id="results-preview">Completa las tareas y pulsa uno de los botones para generar el resumen.</pre>
+    <p class="copy-toast" id="copy-toast">Copiado ✓</p>
+
+    <div class="teacher-panel">
+      <h3>👩‍🏫 Panel del profesor</h3>
+      <p class="hint">Si el alumno te ha pasado el resultado (por Telegram o copiado), pégalo aquí para verlo ordenado.</p>
+      <textarea class="paste-input" id="paste-input" placeholder="Pega aquí el resultado recibido..."></textarea>
+      <div class="results-btn-row">
+        <button class="res-btn res-show" id="res-show">👁️ Ver resultado</button>
+      </div>
+      <div class="parsed-result" id="parsed-result"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+function normalize(str){
+  return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+/* Task 5: theses table */
+const THESES = [
+  "El trabajo híbrido mejora la productividad de los empleados.",
+  "Es normal que la empresa reorganice los equipos sin consultar a los empleados.",
+  "Es mejor tener un equipo propio que un rol de coordinación sin equipo.",
+  "La creatividad y la innovación son más importantes que la estabilidad en el trabajo.",
+  "Cuando hay cambios en la empresa, es mejor adaptarse rápido que resistir.",
+  "Es importante que los empleados sepan exactamente qué va a pasar antes de que ocurra.",
+  "Una persona con familia e hipoteca tiene razón en preocuparse más por los cambios laborales.",
+  "Es posible que dos personas con visiones muy diferentes trabajen bien juntas.",
+];
+const SCALE = ["Totalmente de acuerdo","De acuerdo","Neutral","En desacuerdo","Totalmente en desacuerdo"];
+const t5 = document.getElementById('task5');
+THESES.forEach((text, i) => {
+  const div = document.createElement('div');
+  div.className = 'thesis';
+  let headerCells = SCALE.map(s => `<th>${s}</th>`).join('');
+  let yoCells = SCALE.map((s,j) => `<td><input type="radio" name="t5-yo-${i}" value="${j}"></td>`).join('');
+  let compCells = SCALE.map((s,j) => `<td><input type="radio" name="t5-comp-${i}" value="${j}"></td>`).join('');
+  div.innerHTML = `
+    <p class="thesis-text">Tesis ${i+1}: «${text}»</p>
+    <table class="thesis-table">
+      <tr><th></th>${headerCells}</tr>
+      <tr><td>Yo</td>${yoCells}</tr>
+      <tr><td>Creo que mi compañera</td>${compCells}</tr>
+    </table>`;
+  t5.appendChild(div);
+});
+
+/* Task 3 toolkit strike-through */
+document.querySelectorAll('#toolkit li').forEach(li => {
+  li.addEventListener('click', (e) => {
+    const cb = li.querySelector('input');
+    if(e.target !== cb) cb.checked = !cb.checked;
+    li.classList.toggle('used', cb.checked);
+  });
+});
+
+/* Task 1: check */
+let task1Result = {correct:0, answered:0};
+document.getElementById('check-btn').addEventListener('click', () => {
+  let correctCount = 0, answeredCount = 0;
+  document.querySelectorAll('#task1 .fillblank-sentence').forEach(sentence => {
+    const input = sentence.querySelector('input.blank');
+    input.classList.remove('correct','incorrect');
+    const oldHint = sentence.querySelector('.blank-answer');
+    if(oldHint) oldHint.remove();
+    const val = input.value;
+    if(!val || val.trim() === '') return;
+    answeredCount++;
+    const correctVal = sentence.dataset.answer;
+    if(normalize(val) === normalize(correctVal)){
+      input.classList.add('correct');
+      correctCount++;
+    } else {
+      input.classList.add('incorrect');
+      const hint = document.createElement('span');
+      hint.className = 'blank-answer';
+      hint.textContent = 'Respuesta correcta: ' + correctVal;
+      sentence.appendChild(hint);
+    }
+  });
+  task1Result = {correct: correctCount, answered: answeredCount};
+  const summary = document.getElementById('score-summary');
+  if(answeredCount === 0){
+    summary.textContent = 'Todavía no has respondido ninguna pregunta.';
+  } else {
+    summary.textContent = `Has respondido correctamente ${correctCount} de ${answeredCount} preguntas contestadas.`;
+  }
+  document.getElementById('check-btn').scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+/* Task 6: crossword — vocabulary drawn from the material above */
+const WORDS = [
+  {num:1, dir:'V', row:0, col:1, answer:'SORPRESA',    clue:'(8 letras) Lo que sientes cuando algo no lo esperabas.'},
+  {num:2, dir:'H', row:0, col:5, answer:'HIBRIDO',     clue:'(7 letras) El tipo de trabajo que mezcla casa y oficina.'},
+  {num:2, dir:'V', row:0, col:5, answer:'HIPOTECA',    clue:'(8 letras) Lo que Marcos todavía está pagando por su casa.'},
+  {num:3, dir:'H', row:1, col:0, answer:'COORDINADOR', clue:'(11 letras) El puesto que le podrían ofrecer a Marcos, sin equipo propio.'},
+  {num:3, dir:'V', row:1, col:0, answer:'COMUNICADO',  clue:'(10 letras) Así se llama el mensaje oficial que leyeron los dos.'},
+  {num:4, dir:'V', row:1, col:4, answer:'DUDA',        clue:'(4 letras) Lo que expresas con «no creo que...».'},
+  {num:5, dir:'H', row:5, col:5, answer:'EMPATIA',     clue:'(7 letras) Lo que muestras cuando entiendes los sentimientos del otro.'},
+  {num:6, dir:'H', row:8, col:0, answer:'AUTONOMIA',   clue:'(9 letras) Lo que ganan los nuevos equipos creativos.'},
+];
+const ROWS = 11, COLS = 12;
+const cellMap = {};
+WORDS.forEach(w => {
+  for(let i=0;i<w.answer.length;i++){
+    const r = w.dir==='H' ? w.row : w.row+i;
+    const c = w.dir==='H' ? w.col+i : w.col;
+    const key = r+','+c;
+    if(!cellMap[key]) cellMap[key] = {letter:w.answer[i], nums:[]};
+    if(i===0 && !cellMap[key].nums.includes(w.num)) cellMap[key].nums.push(w.num);
+  }
+});
+
+function buildCrossword(){
+  const grid = document.getElementById('cw-grid');
+  grid.style.gridTemplateColumns = `repeat(${COLS}, 30px)`;
+  grid.style.gridTemplateRows = `repeat(${ROWS}, 30px)`;
+  grid.innerHTML = '';
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const key = r+','+c;
+      const cellDiv = document.createElement('div');
+      if(cellMap[key]){
+        cellDiv.className = 'cw-cell active';
+        if(cellMap[key].nums.length){
+          const num = document.createElement('span');
+          num.className = 'cw-num';
+          num.textContent = cellMap[key].nums.join(',');
+          cellDiv.appendChild(num);
+        }
+        const inp = document.createElement('input');
+        inp.maxLength = 1;
+        inp.dataset.key = key;
+        cellDiv.appendChild(inp);
+      } else {
+        cellDiv.className = 'cw-cell void';
+      }
+      grid.appendChild(cellDiv);
+    }
+  }
+  const hList = document.getElementById('clues-h');
+  const vList = document.getElementById('clues-v');
+  hList.innerHTML = ''; vList.innerHTML = '';
+  WORDS.filter(w=>w.dir==='H').sort((a,b)=>a.num-b.num).forEach(w=>{
+    const li = document.createElement('li'); li.textContent = `${w.num}. ${w.clue}`; hList.appendChild(li);
+  });
+  WORDS.filter(w=>w.dir==='V').sort((a,b)=>a.num-b.num).forEach(w=>{
+    const li = document.createElement('li'); li.textContent = `${w.num}. ${w.clue}`; vList.appendChild(li);
+  });
+}
+
+let timerInterval = null, elapsedSeconds = 0;
+function startTimer(){
+  elapsedSeconds = 0;
+  const timeEl = document.getElementById('cw-time');
+  timeEl.textContent = '00:00';
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    const mm = String(Math.floor(elapsedSeconds/60)).padStart(2,'0');
+    const ss = String(elapsedSeconds%60).padStart(2,'0');
+    timeEl.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+document.getElementById('cw-start').addEventListener('click', () => {
+  document.getElementById('cw-curtain').style.display = 'none';
+  document.getElementById('cw-content').classList.add('active');
+  buildCrossword();
+  startTimer();
+});
+
+let cwResult = {correct:0, total:0, time:'00:00'};
+document.getElementById('cw-check').addEventListener('click', () => {
+  clearInterval(timerInterval);
+  let correct = 0, total = 0;
+  document.querySelectorAll('#cw-grid input').forEach(inp => {
+    total++;
+    const key = inp.dataset.key;
+    inp.classList.remove('correct','incorrect');
+    const val = normalize(inp.value);
+    if(val === normalize(cellMap[key].letter)){
+      inp.classList.add('correct');
+      correct++;
+    } else if(val !== ''){
+      inp.classList.add('incorrect');
+    }
+  });
+  const timeEl = document.getElementById('cw-time');
+  cwResult = {correct, total, time: timeEl.textContent};
+  document.getElementById('cw-result').textContent = `${correct} de ${total} letras correctas — tiempo: ${timeEl.textContent}`;
+  if(correct === total){
+    document.getElementById('cw-winner').innerHTML = '<div class="cw-winner">🏆 ¡Lo lograste! Compara tu tiempo con tu compañera en voz alta para ver quién ganó.</div>';
+  }
+});
+
+/* Results / Telegram export */
+const TELEGRAM_USERNAME = 'TU_USUARIO'; // <-- sustituye por tu @usuario real de Telegram
+
+function buildSummary(){
+  const name = document.getElementById('student-name').value.trim() || '(sin nombre)';
+  const opinion = document.getElementById('t2-opinion').value.trim() || '(no anotada)';
+  const toolsUsed = document.querySelectorAll('#toolkit input:checked').length;
+  const lines = [
+    `Ficha: Marcos — Nexus Solutions`,
+    `Nombre: ${name}`,
+    `Tarea 1 (subjuntivo): ${task1Result.correct}/${task1Result.answered} correctas`,
+    `Tarea 2 — opinión general de Elena (según Marcos): ${opinion}`,
+    `Tarea 3 — herramientas usadas en el diálogo: ${toolsUsed}/6`,
+    `Tarea 6 — crucigrama: ${cwResult.correct}/${cwResult.total} letras, tiempo ${cwResult.time}`,
+  ];
+  return lines.join('\n');
+}
+
+document.getElementById('res-copy').addEventListener('click', () => {
+  const summary = buildSummary();
+  document.getElementById('results-preview').textContent = summary;
+  navigator.clipboard.writeText(summary).then(() => {
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }).catch(() => {
+    document.getElementById('copy-toast').textContent = 'Selecciona y copia el texto manualmente.';
+    document.getElementById('copy-toast').classList.add('show');
+  });
+});
+
+document.getElementById('res-telegram').addEventListener('click', () => {
+  const summary = buildSummary();
+  document.getElementById('results-preview').textContent = summary;
+  const url = `https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(summary)}`;
+  window.open(url, '_blank');
+});
+
+/* Teacher panel: parse pasted result into a readable table */
+document.getElementById('res-show').addEventListener('click', () => {
+  const raw = document.getElementById('paste-input').value.trim();
+  const box = document.getElementById('parsed-result');
+  if(!raw){
+    box.classList.remove('show');
+    return;
+  }
+  const rows = raw.split('\n').map(line => {
+    const idx = line.indexOf(':');
+    if(idx === -1) return `<tr><td colspan="2">${line}</td></tr>`;
+    const label = line.slice(0, idx).trim();
+    const value = line.slice(idx+1).trim();
+    return `<tr><td>${label}</td><td>${value}</td></tr>`;
+  }).join('');
+  box.innerHTML = `<table>${rows}</table>`;
+  box.classList.add('show');
+});
+</script>
+
+</body>
+</html>
