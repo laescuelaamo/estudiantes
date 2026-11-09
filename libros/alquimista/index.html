@@ -196,6 +196,8 @@ body {
 .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 44px); line-height: 1.2; color: var(--cream); margin-bottom: 8px; }
 .hero h1 em { font-style: italic; color: var(--gold-light); }
 .hero-sub { color: var(--muted); font-size: 13px; }
+.reset-btn { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border, rgba(255,255,255,.18)); background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: border-color .15s, color .15s; }
+.reset-btn:hover, .reset-btn:focus-visible { border-color: #d9534f; color: #d9534f; }
 
 .main { max-width: 720px; margin: 0 auto; padding: 0 24px; }
 
@@ -440,6 +442,7 @@ body {
   <div class="hero-eyebrow">Paulo Coelho · 1988 · Vocabulario activo</div>
   <h1>El Alquimista:<br><em>Prólogo y Prefacio</em></h1>
   <p class="hero-sub">B1 · Léxico · Comprensión · Reflexión &nbsp;·&nbsp; 6 ejercicios</p>
+  <button class="reset-btn" type="button" data-reset="1">↺ Restablecer respuestas de esta parte</button>
 </div>
 
 <div class="main">
@@ -703,6 +706,7 @@ body {
   <div class="hero-eyebrow">Paulo Coelho · El Alquimista · Parte 2</div>
   <h1>El Alquimista:<br><em>Santiago y la hija del comerciante</em></h1>
   <p class="hero-sub">B1 · Texto hasta la p. 6 · Léxico · Comprensión · Gramática &nbsp;·&nbsp; 10 ejercicios</p>
+  <button class="reset-btn" type="button" data-reset="2">↺ Restablecer respuestas de esta parte</button>
 </div>
 <div class="main">
 <div class="g2-card"><div class="text-label">Vocabulario de la lectura · Словник</div><div class="g2-grid"><div class="g2-item"><b>el rebaño</b><span>отара, стадо (овець або кіз)</span></div><div class="g2-item"><b>oscurecer</b><span>темніти, сутеніти</span></div><div class="g2-item"><b>abandonar</b><span>залишати, покидати</span></div><div class="g2-item"><b>el sicómoro</b><span>сикомор (дерево)</span></div><div class="g2-item"><b>la sacristía</b><span>ризниця (в церкві)</span></div><div class="g2-item"><b>cierta vez</b><span>одного разу, якось</span></div><div class="g2-item"><b>prófugo/a</b><span>утікач; той, хто втік</span></div><div class="g2-item"><b>semiderruido/a</b><span>напівзруйнований</span></div><div class="g2-item"><b>el cayado</b><span>посох пастуха</span></div><div class="g2-item"><b>el trago</b><span>ковток</span></div><div class="g2-item"><b>los tejidos</b><span>тканини</span></div><div class="g2-item"><b>el esquileo de ovejas</b><span>стрижка овець</span></div><div class="g2-item"><b>la acera</b><span>тротуар</span></div><div class="g2-item"><b>el zurrón</b><span>пастуша торба</span></div><div class="g2-item"><b>vagamente</b><span>невиразно, смутно</span></div><div class="g2-item"><b>los moros</b><span>маври</span></div><div class="g2-item"><b>los ojillos</b><span>оченята</span></div><div class="g2-item"><b>transcurrir</b><span>минати (про час)</span></div></div><div class="g2-hint">💡 En el texto, toca las palabras subrayadas para ver su traducción.</div></div>
@@ -727,6 +731,7 @@ body {
   <div class="hero-eyebrow">Paulo Coelho · El Alquimista · Parte 3</div>
   <h1>El Alquimista:<br><em>El pastor, el padre y la adivina</em></h1>
   <p class="hero-sub">B1 · Texto de las pp. 6–10 · Léxico · Subjuntivo · Estilo indirecto &nbsp;·&nbsp; 18 ejercicios</p>
+  <button class="reset-btn" type="button" data-reset="3">↺ Restablecer respuestas de esta parte</button>
 </div>
 <div class="main">
 <div class="g2-card"><div class="text-label">Antes de empezar · Перед початком</div>
@@ -1397,6 +1402,18 @@ function showPart(n){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('.part-tab').forEach(b=>b.onclick=()=>showPart(+b.dataset.p));
+/* ══ RESET (por parte) ══ */
+const PART_NAMES={1:'Parte 1 · Prólogo y Prefacio',2:'Parte 2 · Texto hasta p. 6',3:'Parte 3 · Texto pp. 6–10'};
+function resetPart(n){
+  if(!confirm('¿Borrar todas tus respuestas de «'+PART_NAMES[n]+'»?\nLas demás partes no se tocan. Esta acción no se puede deshacer.')) return;
+  if(n===1){ appData = {part:appData.part, p2:appData.p2, p3:appData.p3}; }   /* la parte 1 guarda sus claves en la raíz */
+  else if(n===2){ delete appData.p2; }
+  else { delete appData.p3; }
+  saveData(appData);
+  location.reload();   /* la página se reconstruye limpia y vuelve a la misma parte */
+}
+document.querySelectorAll('[data-reset]').forEach(b=>b.addEventListener('click',()=>resetPart(+b.dataset.reset)));
+
 showPart([1,2,3].includes(appData.part)?appData.part:3);
 
 </script>
