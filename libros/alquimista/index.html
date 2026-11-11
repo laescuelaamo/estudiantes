@@ -1418,4 +1418,136 @@ showPart([1,2,3].includes(appData.part)?appData.part:3);
 
 </script>
 
+<style id="ux-alq">
+/* ===== ВЫБОР ОТВЕТОВ: чёткая визуализация ===== */
+.mc-items{gap:14px}
+.mc-item{border:1px solid var(--border);padding:16px 16px 14px}
+.mc-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;counter-reset:opt}
+.mc-opt,:root[data-theme="light"] .mc-opt{position:relative;display:flex;align-items:center;gap:11px;min-height:48px;padding:10px 44px 10px 12px;border-radius:14px;border:2px solid var(--border);background:var(--surface2);color:var(--cream);font:500 14px/1.4 'Inter',sans-serif;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .15s,border-color .15s,background .2s,box-shadow .2s}
+.mc-opt::before{counter-increment:opt;content:counter(opt,upper-alpha);flex:0 0 28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px 'Inter',sans-serif;background:rgba(181,98,42,.16);color:var(--gold-light);transition:.2s}
+.mc-opt::after{content:'';position:absolute;right:12px;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font:800 13px/18px 'Inter',sans-serif;text-align:center;color:#fff;transition:.2s}
+:root .mc-opt:hover{border-color:var(--gold);transform:translateY(-1px);color:var(--cream)}
+:root .mc-opt:active{transform:scale(.985)}
+:root .mc-opt.selected{border-color:var(--copper);background:linear-gradient(135deg,rgba(181,98,42,.34),rgba(201,146,42,.16));box-shadow:0 0 0 4px rgba(181,98,42,.22),0 6px 16px rgba(0,0,0,.18);color:var(--cream);animation:uxpop .28s}
+:root .mc-opt.selected::before{background:var(--copper);color:#fff}
+:root .mc-opt.selected::after{content:'✓';background:var(--copper);border-color:var(--copper)}
+:root .mc-opt.correct{border-color:var(--correct);background:rgba(76,175,125,.16);box-shadow:0 0 0 4px rgba(76,175,125,.2);color:var(--cream);cursor:default;animation:uxpop .35s}
+:root .mc-opt.correct::before{background:var(--correct);color:#fff}
+:root .mc-opt.correct::after{content:'✓';background:var(--correct);border-color:var(--correct)}
+:root .mc-opt.wrong{border-color:var(--wrong);background:rgba(224,85,85,.13);box-shadow:0 0 0 4px rgba(224,85,85,.16);color:var(--cream);animation:uxshake .38s}
+:root .mc-opt.wrong::before{background:var(--wrong);color:#fff}
+:root .mc-opt.wrong::after{content:'✕';background:var(--wrong);border-color:var(--wrong)}
+@keyframes uxpop{0%{transform:scale(.96)}60%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes uxshake{0%,100%{transform:none}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+/* ===== выпадающий выбор (вместо системного select) ===== */
+.cs-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;min-height:46px;padding:9px 12px 9px 14px;border-radius:12px;border:2px dashed var(--border);background:var(--surface2);color:var(--muted);font:500 13.5px/1.35 'Inter',sans-serif;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent}
+.cs-btn:hover{border-color:var(--gold);color:var(--cream)}
+.cs-btn .cs-i{flex:0 0 22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font:800 12px 'Inter',sans-serif;color:#fff;transition:.2s}
+.cs-btn .cs-i::before{content:'▾';color:var(--muted);font-size:13px}
+.cs-btn.open{border-style:solid;border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,146,42,.2)}
+.cs-btn.filled{border-style:solid;border-color:var(--copper);background:linear-gradient(135deg,rgba(181,98,42,.3),rgba(201,146,42,.14));color:var(--cream);font-weight:600;box-shadow:0 0 0 3px rgba(181,98,42,.16)}
+.cs-btn.filled .cs-i{background:var(--copper);border-color:var(--copper)}.cs-btn.filled .cs-i::before{content:'✓';color:#fff;font-size:12px}
+.cs-btn.correct{border-color:var(--correct);background:rgba(76,175,125,.16);box-shadow:0 0 0 3px rgba(76,175,125,.2)}
+.cs-btn.correct .cs-i{background:var(--correct);border-color:var(--correct)}.cs-btn.correct .cs-i::before{content:'✓'}
+.cs-btn.wrong{border-color:var(--wrong);background:rgba(224,85,85,.13);box-shadow:0 0 0 3px rgba(224,85,85,.16);animation:uxshake .38s}
+.cs-btn.wrong .cs-i{background:var(--wrong);border-color:var(--wrong)}.cs-btn.wrong .cs-i::before{content:'✕'}
+.cs-back{position:fixed;inset:0;z-index:998;background:transparent}
+.cs-back.sheet{background:rgba(0,0,0,.5)}
+.cs-pop{position:fixed;z-index:999;overflow:auto;background:var(--surface);border:2px solid var(--gold);border-radius:14px;padding:6px;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:uxpop .18s}
+.cs-pop[hidden],.cs-back[hidden]{display:none}
+.cs-pop .cs-h{font:700 10.5px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 10px 4px}
+.cs-o{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;color:var(--cream);font:500 14px/1.4 'Inter',sans-serif;padding:11px 12px;border-radius:10px;cursor:pointer}
+.cs-o:hover,.cs-o:focus-visible{background:rgba(201,146,42,.2);outline:none}
+.cs-o .ck{flex:0 0 20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font:800 11px 'Inter',sans-serif;color:#fff}
+.cs-o.sel{background:rgba(181,98,42,.28);font-weight:700}.cs-o.sel .ck{background:var(--copper);border-color:var(--copper)}.cs-o.sel .ck::before{content:'✓'}
+.cs-o.used{opacity:.5}.cs-o.used::after{content:'usado';margin-left:auto;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cs-o.clr{color:var(--muted);font-size:12.5px}
+/* ===== пропуски ===== */
+.gap-blank,:root[data-theme="light"] .gap-blank{background:rgba(181,98,42,.1);border:0;border-bottom:3px solid var(--copper);border-radius:8px 8px 0 0;padding:3px 24px 3px 8px;color:var(--gold-light);transition:.2s}
+:root[data-theme="light"] .gap-blank{color:var(--copper)}
+.gap-blank:focus{background:rgba(201,146,42,.2);border-bottom-color:var(--gold-light);box-shadow:0 4px 0 -1px rgba(201,146,42,.35)}
+.gap-blank:not(:placeholder-shown){background:rgba(181,98,42,.22);font-weight:600}
+:root .gap-blank.correct{background:rgba(76,175,125,.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='10' fill='%234caf7d'/%3E%3Cpath d='M5.5 10.5l3 3 6-6.5' stroke='%23fff' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 4px center/16px;border-bottom-color:var(--correct);color:var(--correct)}
+:root .gap-blank.wrong{background:rgba(224,85,85,.15) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='10' fill='%23e05555'/%3E%3Cpath d='M6.5 6.5l7 7M13.5 6.5l-7 7' stroke='%23fff' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 4px center/16px;border-bottom-color:var(--wrong);color:var(--wrong);animation:uxshake .38s}
+.p2bank span.used,.uxbank.used{opacity:.4;text-decoration:line-through;border-style:dashed}
+.p2bank span,.uxbank{transition:.2s}
+/* ===== слова в тексте, порядок, результат ===== */
+:root .cw.sel{background:var(--copper);color:#fff;box-shadow:0 0 0 2px rgba(181,98,42,.35);font-weight:700;animation:uxpop .25s}
+:root .cw.ok{background:var(--correct);color:#fff;box-shadow:none;font-weight:700}
+:root .cw.bad{background:var(--wrong);color:#fff;box-shadow:none;text-decoration:line-through}
+.p2ord-row{transition:.2s}
+.p2ord-row.ok{background:rgba(76,175,125,.14);border-width:2px}.p2ord-row.ok .p2ord-n{background:var(--correct)}
+.p2ord-row.bad{background:rgba(224,85,85,.12);border-width:2px}.p2ord-row.bad .p2ord-n{background:var(--wrong)}
+.p2ord-b button{padding:5px 11px;font-size:12px}
+.p2res:not(:empty){display:inline-block;padding:6px 14px;border-radius:99px;background:rgba(181,98,42,.18);color:var(--gold-light);font-size:13px;animation:uxpop .3s}
+.p2res.full{background:rgba(76,175,125,.2);color:var(--correct)}
+.p2res[data-l="low"]{background:rgba(224,85,85,.16);color:var(--wrong)}
+.zone-chip.correct-chip::before{content:'✓ '}.zone-chip.wrong-chip::before{content:'✕ '}
+@media(max-width:560px){.mc-opts{grid-template-columns:1fr}.cs-btn{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.mc-opt,.cs-btn,.gap-blank,.cw,.p2res{animation:none!important}}
+</style>
+<script>
+/* ===== UX: выбор ответов ===== */
+function selectMC(btn){ /* часть 1: отмечаем только выбранный вариант, правильный не раскрываем */
+  const q=btn.dataset.q,all=[...document.querySelectorAll('.mc-opt[data-q="'+q+'"]')];
+  if(all.some(o=>o.classList.contains('correct')))return;
+  all.forEach(o=>o.classList.remove('selected','correct','wrong'));
+  void btn.offsetWidth;btn.classList.add(btn.dataset.ans==='correct'?'correct':'wrong');
+}
+(function(){
+  const nz=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9ñ ]/g,'').replace(/\s+/g,' ').trim();
+  /* --- выпадающий список --- */
+  const back=document.createElement('div'),pop=document.createElement('div');
+  back.className='cs-back';pop.className='cs-pop';back.hidden=pop.hidden=true;document.body.append(back,pop);
+  let cur=null;
+  const close=()=>{back.hidden=pop.hidden=true;back.classList.remove('sheet');if(cur){cur.btn.classList.remove('open');cur.btn.focus&&0;cur=null}};
+  back.onclick=close;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  window.addEventListener('scroll',()=>{if(cur&&!back.classList.contains('sheet'))close()},true);
+  window.addEventListener('resize',close);
+  function open(sel,btn){
+    close();cur={sel,btn};btn.classList.add('open');
+    const grid=sel.closest('.match-grid')||sel.parentNode.parentNode;
+    const used=new Set([...grid.querySelectorAll('select')].filter(s=>s!==sel&&s.value!=='').map(s=>s.value));
+    pop.innerHTML='<div class="cs-h">Elige una opción · Обери варіант</div>';
+    [...sel.options].forEach(o=>{
+      if(o.value==='')return;
+      const b=document.createElement('button');b.type='button';
+      b.className='cs-o'+(sel.value===o.value?' sel':'')+(used.has(o.value)?' used':'');
+      b.innerHTML='<span class="ck"></span><span></span>';b.lastChild.textContent=o.textContent;
+      b.onclick=()=>{sel.value=o.value;sel.dispatchEvent(new Event('change',{bubbles:true}));close()};
+      pop.appendChild(b)});
+    if(sel.value!==''){const c=document.createElement('button');c.type='button';c.className='cs-o clr';c.innerHTML='✕ Quitar · Прибрати вибір';c.onclick=()=>{sel.value='';sel.dispatchEvent(new Event('change',{bubbles:true}));close()};pop.appendChild(c)}
+    back.hidden=pop.hidden=false;
+    const sheet=innerWidth<=560;
+    if(sheet){back.classList.add('sheet');Object.assign(pop.style,{left:'10px',right:'10px',bottom:'10px',top:'auto',width:'auto',maxHeight:Math.round(innerHeight*.62)+'px'})}
+    else{const r=btn.getBoundingClientRect(),w=Math.min(Math.max(r.width,300),innerWidth-20),left=Math.max(10,Math.min(r.left,innerWidth-w-10));
+      pop.style.width=w+'px';pop.style.left=left+'px';pop.style.right='auto';
+      const below=innerHeight-r.bottom-14,above=r.top-14,h=Math.min(pop.scrollHeight+4,360);
+      if(below>=Math.min(h,220)||below>=above){pop.style.top=(r.bottom+6)+'px';pop.style.bottom='auto';pop.style.maxHeight=Math.min(360,below)+'px'}
+      else{pop.style.bottom=(innerHeight-r.top+6)+'px';pop.style.top='auto';pop.style.maxHeight=Math.min(360,above)+'px'}}
+    const s=pop.querySelector('.sel');if(s)s.scrollIntoView({block:'nearest'});
+  }
+  function enhance(sel){
+    if(sel._cs)return;sel._cs=1;
+    const btn=document.createElement('button');btn.type='button';btn.className='cs-btn';btn.innerHTML='<span class="cs-t"></span><span class="cs-i"></span>';
+    sel.style.display='none';sel.after(btn);
+    const sync=()=>{const has=sel.value!=='';btn.querySelector('.cs-t').textContent=has?sel.options[sel.selectedIndex].textContent:'— elige · обери —';
+      btn.classList.toggle('filled',has);btn.classList.toggle('correct',sel.classList.contains('correct'));btn.classList.toggle('wrong',sel.classList.contains('wrong'))};
+    new MutationObserver(sync).observe(sel,{attributes:true,attributeFilter:['class']});
+    sel.addEventListener('change',sync);btn.onclick=()=>cur&&cur.btn===btn?close():open(sel,btn);sync();
+  }
+  document.querySelectorAll('select.p2sel,select.match-select').forEach(enhance);
+  /* --- банк слов: отмечаем использованные --- */
+  document.querySelectorAll('span[style*="border-radius:16px"]').forEach(s=>s.classList.add('uxbank'));
+  function bankSync(card){
+    const vals=[...card.querySelectorAll('.gap-blank')].map(i=>nz(i.value)).filter(Boolean);
+    card.querySelectorAll('.p2bank span:not(:first-child),.uxbank').forEach(c=>{const w=nz(c.textContent).replace(/^(el|la|los|las) /,'');c.classList.toggle('used',vals.some(v=>v.replace(/^(el|la|los|las) /,'')===w))});
+  }
+  document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('gap-blank')){const c=e.target.closest('.ex-card');if(c)bankSync(c)}});
+  document.querySelectorAll('.ex-card').forEach(bankSync);
+  /* --- итог: цвет плашки по результату --- */
+  document.querySelectorAll('.p2res').forEach(r=>new MutationObserver(()=>{const m=r.textContent.match(/(\d+)\s*\/\s*(\d+)/);if(m)r.dataset.l=+m[1]/+m[2]<.5?'low':'ok';else delete r.dataset.l}).observe(r,{childList:true,characterData:true,subtree:true}));
+})();
+</script>
 </body></html>
