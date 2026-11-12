@@ -602,4 +602,19 @@ CFG.lessons.forEach((l,li)=>{
 const rw=el('div');rw.id='repwrap';document.body.appendChild(rw);
 progress();
 window.__dbg={S,CFG,reportHtml,makePdf,buildPdf};
-</script></body></html>
+</script><script>/* amo-transfer: botón para llevar las respuestas a la nueva dirección */
+(function(){
+var KEY=(typeof CFG!=='undefined'&&CFG.key)?CFG.key:'';var NEW='https://clases.amo-la-escuela.com/practica-individual-margo-89jgpw/';
+var d=document.createElement('div');d.id='amoTransfer';
+d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:2147483000;background:#fff;color:#24324a;border:2px solid #f0a050;border-radius:16px;padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.3);font:600 14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;gap:12px;align-items:center;flex-wrap:wrap;max-width:620px;margin:0 auto';
+d.innerHTML='<span style="flex:1 1 220px">\ud83d\udce6 <b>Ця сторінка переїхала на нову адресу.</b><br><span style="font-weight:500;font-size:13px">Натисни кнопку: відкриється нова сторінка, і всі твої відповіді перенесуться туди.</span></span><a id="amoGo" href="#" style="background:#f0a050;color:#fff;text-decoration:none;font-weight:800;border-radius:12px;padding:11px 18px;white-space:nowrap">Перенести відповіді \u2192</a>';
+document.body.appendChild(d);
+document.getElementById('amoGo').addEventListener('click',function(e){
+  var url=NEW;
+  try{var raw=KEY?localStorage.getItem(KEY):null;var has=false;
+    try{var o=JSON.parse(raw||'{}');has=!!(Object.keys(o.done||{}).length||Object.keys(o.rep||{}).length||Object.keys(o.fav||{}).length||Object.keys(o.seen||{}).length||String(o.notes||'').trim()||Object.keys(o.cards||{}).some(function(k){return o.cards[k]&&o.cards[k].length}))}catch(z){has=!!raw}
+    if(raw&&has){var b=btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');url=NEW+'#import='+KEY+'.'+b}}catch(x){}
+  this.href=url;
+});
+})();</script>
+</body></html>
